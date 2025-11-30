@@ -7,6 +7,7 @@ import App from './App.tsx'
 import { refreshAccessToken } from '@/lib/apiClient'
 
 refreshAccessToken().finally(() => {
+  console.log('=== XXXXXXXXXXXXXXXXXXXXXx ===', import.meta.env.VITE_API_BASE_URL)
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
       <BrowserRouter>

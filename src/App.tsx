@@ -3,12 +3,11 @@ import AuthLayout from './layouts/AuthLayout'
 import { LoginForm } from './components/Form/login'
 import { RegisterForm } from './components/Form/register'
 import AppLayout from './layouts/AppLayout'
-import UserManage from './pages/system/UserManage'
+import UserManage from './pages/system/userManage/UserManage'
 import DeptManage from './pages/system/deptManage/DeptManage'
 import Dashboard from './pages/Dashboard'
 import MenuManage from './pages/system/menuManage/MenuManage'
-
-
+import RoleManage from './pages/system/roleManage/RoleManage'
 function App() {
   return (
     <div className="App">
@@ -27,6 +26,7 @@ function App() {
           <Route path="system/user-manage" element={<UserManage />} />
           <Route path="system/dept-manage" element={<DeptManage />} />
           <Route path="system/menu-manage" element={<MenuManage />} />
+          <Route path="system/role-manage" element={<RoleManage />} />
         </Route>
 
       </Routes>

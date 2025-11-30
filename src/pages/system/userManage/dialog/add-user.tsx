@@ -12,7 +12,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Plus } from "lucide-react"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { axiosClient } from "@/lib/apiClient"
@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/field"
 import { useForm, Controller } from "react-hook-form"
 import { HoverCardFormItem } from "@/components/hover-card-form-item"
+import { TreeSelect } from "@/components/tree-select"
 
 // 后端账号可用性校验（约定返回 { available: boolean }）
 async function checkUserAccount(account: string) {
@@ -76,6 +77,7 @@ const RegisterSchema = z.object({
       const isAvailable = await checkUserAccountWithDebounce(value);
       return isAvailable;
     }, { message: "账号已存在" }),
+  deptId: z.string().min(1, { message: "部门不能为空" }),
   email: z.string().email("请输入有效的邮箱地址"),
   password: z.string()
     .min(8, { message: "密码长度不能少于8位" })
@@ -100,6 +102,8 @@ type TRegisterSchema = z.infer<typeof RegisterSchema>;
 
 function AddUserFormContent({ onSuccess }: { onSuccess?: () => void }) {
 
+  const [deptTree, setDeptTree] = useState([]);
+
   const { register, handleSubmit, control, formState: { errors, isSubmitting, touchedFields, isSubmitted } } = useForm<TRegisterSchema>({
     resolver: zodResolver(RegisterSchema),
     mode: "onChange",
@@ -107,12 +111,24 @@ function AddUserFormContent({ onSuccess }: { onSuccess?: () => void }) {
     defaultValues: {
       account: "",
       name: "",
+      deptId: "",
       email: "",
       password: "",
       confirmPassword: "",
       sex: "0",
     },
   });
+
+
+  const loadDeptTree = useCallback(() => {
+    axiosClient.get("/system/dept/list").then((res) => {
+      setDeptTree(res.data);
+    });
+  }, []);
+
+  useEffect(() => {
+    loadDeptTree();
+  }, [loadDeptTree]);
 
   const onSubmit = async (data: TRegisterSchema) => {
     try {
@@ -154,6 +170,20 @@ function AddUserFormContent({ onSuccess }: { onSuccess?: () => void }) {
             <Input id="account" type="text" placeholder="请输入账号" {...register("account")} />
             {errors.account && (
               <FieldError errors={[errors.account]} className="col-start-2" />
+            )}
+          </Field>
+
+          <Field orientation="grid">
+            <FieldLabel htmlFor="deptId">部门</FieldLabel>
+              <Controller
+                name="deptId"
+                control={control}
+                render={({ field }) => (
+                  <TreeSelect value={field.value} onChange={field.onChange} placeholder="请选择部门" data={deptTree} />
+                )}
+              />
+            {errors.deptId && (
+              <FieldError errors={[errors.deptId]} className="col-start-2" />
             )}
           </Field>
 
@@ -217,8 +247,6 @@ function AddUserFormContent({ onSuccess }: { onSuccess?: () => void }) {
               <FieldError errors={[errors.confirmPassword]} className="col-start-2" />
             )}
           </Field>
-
-
 
           {isSubmitting && (
             <div className="absolute inset-0 bg-white/30 backdrop-blur-sm flex items-center justify-center rounded-lg">

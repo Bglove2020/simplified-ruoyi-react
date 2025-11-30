@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { axiosClient } from "@/lib/apiClient";
 import { toast } from "sonner";
-import { DialogUserAddForm } from "@/components/Dialog/dialog-form-add-user";
+import { DialogUserAddForm } from "@/pages/system/userManage/dialog/add-user";
 import { DialogFormChangePassword } from "@/components/Dialog/dialog-form-change-password";
 import { DialogDeleteConfirm } from "@/components/Dialog/dialog-delete-confirm";
 import { DialogMultiDeleteConfirm } from "@/components/Dialog/dialog-multi-delete-confirm";
@@ -35,6 +35,7 @@ type user = {
   email: string;
   sex: "0" | "1" | "2";
   status: "0" | "1";
+  deptId: string;
 };
 
 const multiSelectOptions = [
@@ -88,8 +89,8 @@ export default function UserManage() {
   }, []);
 
   const deleteUser = useCallback(async () => {
-    return await axiosClient.delete(`/system/user/delete?publicId=${activeUser?.publicId}`);
-  }, []);
+    return await axiosClient.delete(`/system/user/delete/${activeUser?.publicId}`);
+  }, [activeUser]);
 
   useEffect(() => {
     // 初始加载
@@ -340,6 +341,10 @@ export default function UserManage() {
           open={deleteDialogOpen}
           onOpenChange={setDeleteDialogOpen}
           deleteApi={deleteUser}
+          onSuccess={() => {
+            loadUsers();
+            setDeleteDialogOpen(false);
+          }}
           title="删除用户"
           >
             <div className="text-sm mb-2">确定要删除

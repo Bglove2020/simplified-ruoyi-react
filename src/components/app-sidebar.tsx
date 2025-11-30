@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Bot, Command, Building2, Menu, SquareTerminal, User } from "lucide-react"
+import { Bot, Command, Building2, Menu, SquareTerminal, User, BookUser } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
 import { NavUser } from "@/components/nav-user"
@@ -47,6 +47,11 @@ const data = {
           title: "菜单管理",
           icon: Menu,
           url: "/system/menu-manage",
+        },
+        {
+          title: "角色管理",
+          icon: BookUser,
+          url: "/system/role-manage",
         }
       ],
     },
