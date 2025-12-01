@@ -7,17 +7,16 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
-import { Plus } from "lucide-react"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useCallback, useEffect, useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { axiosClient } from "@/lib/apiClient"
-import { Loader2, SearchX } from "lucide-react"
+import { Loader2 } from "lucide-react"
 import { toast } from 'sonner'
+import { MultiSelectDropdown } from "@/components/multi-select-dropdown"
 
 import {
   Field,
@@ -66,7 +65,7 @@ async function checkUserAccountWithDebounce(account: string, delay: number = 500
   });
 }
 
-const RegisterSchema = z.object({
+const CreateUserSchema = z.object({
   name: z.string()
     .min(1, { message: "姓名不能为空" }),
   account: z.string()
@@ -77,7 +76,8 @@ const RegisterSchema = z.object({
       const isAvailable = await checkUserAccountWithDebounce(value);
       return isAvailable;
     }, { message: "账号已存在" }),
-  deptId: z.string().min(1, { message: "部门不能为空" }),
+  deptPublicId: z.string().min(1, { message: "部门不能为空" }),
+  rolePublicIds: z.array(z.string()).min(1, { message: "至少需要选择一个角色" }),
   email: z.string().email("请输入有效的邮箱地址"),
   password: z.string()
     .min(8, { message: "密码长度不能少于8位" })
@@ -90,6 +90,7 @@ const RegisterSchema = z.object({
     .regex(/[0-9]/, { message: "确认密码必须包含至少一个数字" })
     .regex(/[!@#$%^&*(),.?":{}|<>]/, { message: "确认密码必须包含至少一个特殊符号" }),
   sex: z.enum(["0", "1", "2"], { message: "请选择性别" }),
+  status: z.enum(["0", "1"], { message: "请选择状态" }),
 }).refine((data) => {
   console.log('密码相同性校验')
   return data.password === data.confirmPassword
@@ -98,26 +99,70 @@ const RegisterSchema = z.object({
   path: ["confirmPassword"],
 })
 
-type TRegisterSchema = z.infer<typeof RegisterSchema>;
+const UpdateUserSchema = z.object({
+  name: z.string()
+    .min(1, { message: "姓名不能为空" }),
+  publicId:z.string(),
+  sex: z.enum(["0", "1", "2"], { message: "请选择性别" }),
+  status: z.enum(["0", "1"], { message: "请选择状态" }),
+  deptPublicId: z.string().min(1, { message: "部门不能为空" }),
+  rolePublicIds: z.array(z.string()).min(1, { message: "至少需要选择一个角色" }),
+})
 
-function AddUserFormContent({ onSuccess }: { onSuccess?: () => void }) {
+type TCreateUserSchema = z.infer<typeof CreateUserSchema>;
+type TUpdateUserSchema = z.infer<typeof UpdateUserSchema>;
 
+
+export function UserDialog({ 
+  open, 
+  onOpenChange, 
+  onSuccess,
+  activeUser,
+  isCreate
+}: { 
+  open: boolean, 
+  onOpenChange: (open: boolean) => void, 
+  onSuccess?: () => void,
+  activeUser?: any
+  isCreate?: boolean
+}) {
   const [deptTree, setDeptTree] = useState([]);
+  const [roleList, setRoleList] = useState([]);
 
-  const { register, handleSubmit, control, formState: { errors, isSubmitting, touchedFields, isSubmitted } } = useForm<TRegisterSchema>({
-    resolver: zodResolver(RegisterSchema),
+  const defaultValues = isCreate ? {
+    name: "",
+    account: "",
+    deptPublicId: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    sex: "1" as const,
+    status: "1" as const,
+    rolePublicIds: [] as string[],
+  } : {
+    publicId:activeUser.publicId,
+    name: activeUser?.name || "",
+    sex: (activeUser?.sex || "1") as "0" | "1" | "2",
+    status: (activeUser?.status || "1") as "0" | "1",
+    deptPublicId: activeUser?.deptPublicId || "",
+    rolePublicIds: (activeUser?.rolePublicIds || []) as string[],
+  };
+
+  const { register, handleSubmit, control, formState: { errors, isSubmitting, touchedFields, isSubmitted } } = useForm<TCreateUserSchema | TUpdateUserSchema>({
+    resolver: zodResolver(isCreate ? CreateUserSchema : UpdateUserSchema),
     mode: "onChange",
-    shouldUnregister: true,
-    defaultValues: {
-      account: "",
-      name: "",
-      deptId: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-      sex: "0",
-    },
+    // shouldUnregister: true,
+    defaultValues: defaultValues,
   });
+
+  useEffect(() => {
+    axiosClient.get("/system/role/list").then((res) => {
+      setRoleList(res.data.data.map((role: any) => ({
+        label: role.name,
+        value: role.publicId,
+      })));
+    });
+  }, []);
 
 
   const loadDeptTree = useCallback(() => {
@@ -130,27 +175,28 @@ function AddUserFormContent({ onSuccess }: { onSuccess?: () => void }) {
     loadDeptTree();
   }, [loadDeptTree]);
 
-  const onSubmit = async (data: TRegisterSchema) => {
+  const onSubmit = async (data: TCreateUserSchema | TUpdateUserSchema) => {
     try {
       await new Promise(resolve => setTimeout(resolve, 500));
-      const res = await axiosClient.post('/system/user/create', data);
+      const res = await axiosClient.post(isCreate ? '/system/user/create' : '/system/user/update', data);
       if (res.status === 201) {
-        toast.success("新增成功！");
+        toast.success(res.data.msg);
         onSuccess?.();
       } else {
-        console.error("新增失败", res);
+        toast.error(res.data.msg);
       }
     } catch (err: any) {
-      console.error("发生异常", err);
+      toast.error(String(err));
     }
   };
 
   return (
-    <>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[500px]">
       <DialogHeader className="">
-        <DialogTitle>新增用户</DialogTitle>
+        <DialogTitle>{isCreate ? "新增用户" : "编辑用户"}</DialogTitle>
         <DialogDescription>
-          请完善用户信息
+          {isCreate ? "请完善用户信息" : "请编辑用户信息"}
         </DialogDescription>
       </DialogHeader>
       <form className="max-h-[50vh] sm:max-h-[65vh] overflow-y-auto pr-2 py-2">
@@ -165,42 +211,88 @@ function AddUserFormContent({ onSuccess }: { onSuccess?: () => void }) {
             )}
           </Field>
 
-          <Field orientation="grid">
-            <FieldLabel htmlFor="account">账号</FieldLabel>
-            <Input id="account" type="text" placeholder="请输入账号" {...register("account")} />
-            {errors.account && (
-              <FieldError errors={[errors.account]} className="col-start-2" />
-            )}
-          </Field>
+          {
+            isCreate && (
+              <Field orientation="grid">
+                <FieldLabel htmlFor="account">账号</FieldLabel>
+                <Input id="account" type="text" placeholder="请输入账号" {...register("account")} />
+                {(errors as any).account && (
+                  <FieldError errors={[(errors as any).account]} className="col-start-2" />
+                )}
+              </Field>
+            )
+          }
 
           <Field orientation="grid">
             <FieldLabel htmlFor="deptId">部门</FieldLabel>
               <Controller
-                name="deptId"
+                name="deptPublicId"
                 control={control}
                 render={({ field }) => (
                   <TreeSelect value={field.value} onChange={field.onChange} placeholder="请选择部门" data={deptTree} />
                 )}
               />
-            {errors.deptId && (
-              <FieldError errors={[errors.deptId]} className="col-start-2" />
+            {errors.deptPublicId && (
+              <FieldError errors={[errors.deptPublicId]} className="col-start-2" />
             )}
           </Field>
 
+          {isCreate && (
+            <Field orientation="grid">
+              <FieldLabel htmlFor="email">邮箱</FieldLabel>
+              <Input
+                id="email"
+                type="email"
+                placeholder="请输入邮箱"
+                {...register("email")}
+              />
+              {(errors as any).email && (
+                <FieldError errors={[(errors as any).email]} className="col-start-2" />
+              )}
+            </Field>
+          )}
+
           <Field orientation="grid">
-            <FieldLabel htmlFor="email">邮箱</FieldLabel>
-            <Input
-              id="email"
-              type="email"
-              placeholder="请输入邮箱"
-              {...register("email")}
+            <FieldLabel htmlFor="roles">角色</FieldLabel>
+            <Controller
+              name="rolePublicIds"
+              control={control}
+              render={({ field }) => (
+                <MultiSelectDropdown options={roleList} value={field.value} onChange={field.onChange} />
+              )}
             />
-            {errors.email && (
-              <FieldError errors={[errors.email]} className="col-start-2" />
+            {errors.rolePublicIds && (
+              <FieldError errors={[errors.rolePublicIds]} className="col-start-2" />
             )}
           </Field>
 
-          <Field orientation="grid">
+          {isCreate && (
+            <>
+              <Field orientation="grid">
+                <FieldLabel htmlFor="password">
+                  <span>密码</span>
+                  <HoverCardFormItem content="密码长度不能少于8位，必须包含至少一个英文字符、一个数字和一个特殊字符" />
+                </FieldLabel>
+                <Input id="password" type="password" placeholder="请输入密码" {...register("password")} />
+                {(errors as any).password && ((touchedFields as any).password || isSubmitted) && (
+                  <FieldError errors={[(errors as any).password]} className="col-start-2" />
+                )}
+              </Field>
+
+              <Field orientation="grid">
+                <FieldLabel htmlFor="confirm-password">
+                  确认密码
+                </FieldLabel>
+                <Input id="confirm-password" type="password" placeholder="请确认密码" {...register("confirmPassword")} />
+                {(errors as any).confirmPassword && ((touchedFields as any).confirmPassword || isSubmitted) && (
+                  <FieldError errors={[(errors as any).confirmPassword]} className="col-start-2" />
+                )}
+              </Field>
+            </>
+          )}
+
+          
+<Field orientation="grid">
             <FieldLabel className="basis-[100px] shrink-0 grow-0">性别</FieldLabel>
             <Controller
               name="sex"
@@ -228,23 +320,25 @@ function AddUserFormContent({ onSuccess }: { onSuccess?: () => void }) {
           </Field>
 
           <Field orientation="grid">
-            <FieldLabel htmlFor="password">
-              <span>密码</span>
-              <HoverCardFormItem content="密码长度不能少于8位，必须包含至少一个英文字符、一个数字和一个特殊字符" />
-            </FieldLabel>
-            <Input id="password" type="password" placeholder="请输入密码" {...register("password")} />
-            {errors.password && (touchedFields.password || isSubmitted) && (
-              <FieldError errors={[errors.password]} className="col-start-2" />
-            )}
-          </Field>
-
-          <Field orientation="grid">
-            <FieldLabel htmlFor="confirm-password">
-              确认密码
-            </FieldLabel>
-            <Input id="confirm-password" type="password" placeholder="请确认密码" {...register("confirmPassword")} />
-            {errors.confirmPassword && (touchedFields.confirmPassword || isSubmitted) && (
-              <FieldError errors={[errors.confirmPassword]} className="col-start-2" />
+            <FieldLabel className="basis-[100px] shrink-0 grow-0">状态</FieldLabel>
+            <Controller
+              name="status"
+              control={control}
+              render={({ field }) => (
+                <RadioGroup value={field.value} onValueChange={field.onChange} defaultValue="0" className="flex space-x-4">
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="1" id="status-normal" />
+                    <FieldLabel htmlFor="status-normal">启用</FieldLabel>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="0" id="status-disable" />
+                    <FieldLabel htmlFor="status-disable">禁用</FieldLabel>
+                  </div>
+                </RadioGroup>
+              )}
+            />
+            {errors.status && (touchedFields.status || isSubmitted) && (
+              <FieldError errors={[errors.status]} className="col-start-2" />
             )}
           </Field>
 
@@ -264,22 +358,6 @@ function AddUserFormContent({ onSuccess }: { onSuccess?: () => void }) {
         </DialogClose>
         <Button type="submit" onClick={handleSubmit(onSubmit)}>确定</Button>
       </DialogFooter>
-    </>
-  );
-}
-
-export function DialogUserAddForm({ onCreated }: { onCreated?: () => void }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline">
-          <span>新增用户</span>
-          <Plus />
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
-        <AddUserFormContent onSuccess={() => { setOpen(false); onCreated?.(); }} />
       </DialogContent>
     </Dialog>
   );

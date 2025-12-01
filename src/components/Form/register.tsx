@@ -25,7 +25,7 @@ import { HoverCardFormItem } from "../hover-card-form-item"
 
 async function checkUserAccount(account: string) {
   try {
-    const response = await axiosClient.get(`/user/checkUserAccount?account=${account}`);
+    const response = await axiosClient.get(`system/user/checkUserAccount?account=${account}`);
     return response.data.available;
   } catch (error) {
     console.error('检查账号是否存在失败:', error);
@@ -42,7 +42,7 @@ const RegisterSchema = z.object({
     .min(1, { message: "姓名不能为空" }),
   account: z.string()
     .min(1, { message: "账号不能为空" })
-    .min(6, { message: "账号长度不能少于6位" })
+    .min(5, { message: "账号长度至少为5位" })
     .refine(async (value) => {
       // 如果值没变，直接返回上次的结果，避免重复请求
       if (value === lastValidatedAccount) {

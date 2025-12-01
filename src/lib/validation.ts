@@ -7,7 +7,7 @@ export const passwordComplexRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-
 export function userAccountSchema() {
   return z
   .string()
-  .min(6, { message: `账号长度少于6位` })
+  .min(5, { message: `账号长度至少为5位` })
 }
 
 // 可复用的用户名校验（最小长度可配置）

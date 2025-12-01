@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { SingleSelect } from "@/components/single-select";
 import { MultiSelect } from "@/components/multi-select";
-import { Trash,MoreHorizontal, Trash2, RotateCcw } from "lucide-react";
+import { Trash, MoreHorizontal, Trash2, RotateCcw, Pencil, Plus } from "lucide-react";
 import { DataTable } from "@/components/data-table";
 import type { ColumnDef, RowSelectionState } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { axiosClient } from "@/lib/apiClient";
 import { toast } from "sonner";
-import { DialogUserAddForm } from "@/pages/system/userManage/dialog/add-user";
+import { UserDialog } from "@/pages/system/userManage/dialog/add-user";
 import { DialogFormChangePassword } from "@/components/Dialog/dialog-form-change-password";
 import { DialogDeleteConfirm } from "@/components/Dialog/dialog-delete-confirm";
 import { DialogMultiDeleteConfirm } from "@/components/Dialog/dialog-multi-delete-confirm";
@@ -35,7 +35,8 @@ type user = {
   email: string;
   sex: "0" | "1" | "2";
   status: "0" | "1";
-  deptId: string;
+  deptPublicId?: string;
+  rolePublicIds?: string[];
 };
 
 const multiSelectOptions = [
@@ -75,6 +76,8 @@ export default function UserManage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [multiDeleteDialogOpen, setMultiDeleteDialogOpen] = useState(false);
   const [activeUser, setActiveUser] = useState<user | null>(null);
+  const [userDialogOpen, setUserDialogOpen] = useState(false);
+  const [isCreate, setIsCreate] = useState(true);
 
   const loadUsers = useCallback(() => {
     axiosClient
@@ -184,10 +187,10 @@ export default function UserManage() {
             publicId: row.original.publicId,
             status: checked ? "1" : "0",
           }).then((res) => {
-            if(res.data.success){
+            if (res.data.success) {
               toast.success(res.data.msg);
               loadUsers();
-            }else{
+            } else {
               toast.error(res.data.msg);
             }
           }).catch((e) => {
@@ -222,6 +225,13 @@ export default function UserManage() {
                 >
                   <span className="grow">重置密码</span>
                   <RotateCcw />
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="cursor-pointer gap-8"
+                  onClick={() => { setIsCreate(false); setActiveUser(row.original); setUserDialogOpen(true) }}
+                >
+                  <span className="grow">编辑用户</span>
+                  <Pencil />
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="my-1" />
                 <DropdownMenuItem
@@ -292,7 +302,10 @@ export default function UserManage() {
           <Download />
         </Button> */}
 
-        <DialogUserAddForm onCreated={loadUsers} />
+        <Button variant="outline" onClick={() => { setIsCreate(true); setUserDialogOpen(true) }}>
+          <span>新增用户</span>
+          <Plus />
+        </Button>
 
         <Button
           variant="outline"
@@ -323,6 +336,22 @@ export default function UserManage() {
         />
       </div>
 
+      {
+        userDialogOpen && (
+          <UserDialog
+            open={userDialogOpen}
+            onOpenChange={setUserDialogOpen}
+            onSuccess={() => {
+              loadUsers();
+              setUserDialogOpen(false);
+              setActiveUser(null);
+            }}
+            isCreate={isCreate}
+            activeUser={activeUser}
+          />
+        )
+      }
+
       {/* 全局渲染一次：重置密码弹窗（受控） */}
       {activeUser && (
         <DialogFormChangePassword
@@ -346,11 +375,11 @@ export default function UserManage() {
             setDeleteDialogOpen(false);
           }}
           title="删除用户"
-          >
-            <div className="text-sm mb-2">确定要删除
-              <span className="bg-primary/10 border border-primary px-3 py-1 rounded-md mx-1">{activeUser?.account}</span>吗？
-            </div>
-          </DialogDeleteConfirm>
+        >
+          <div className="text-sm mb-2">确定要删除
+            <span className="bg-primary/10 border border-primary px-3 py-1 rounded-md mx-1">{activeUser?.account}</span>吗？
+          </div>
+        </DialogDeleteConfirm>
       )}
       {rowSelection && (
         <DialogMultiDeleteConfirm
