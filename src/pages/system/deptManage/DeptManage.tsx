@@ -51,13 +51,13 @@ export default function DeptManage() {
 
   const loadDepts = useCallback(() => {
     axiosClient
-      .get<DeptNode[]>("/system/dept/list")
-      .then((res) => { setData(res.data); })
+      .get<{data: DeptNode[]}>("/system/dept/list")
+      .then((res) => { setData(res.data.data); })
   }, [])
 
   const deleteDept = useCallback(async () => {
     return await axiosClient.delete(`/system/dept/delete?publicId=${activeDept?.publicId}`);
-  }, []);
+  }, [activeDept]);
 
   useEffect(() => {
     loadDepts();
@@ -210,7 +210,7 @@ export default function DeptManage() {
         openDeleteDialog && <DialogDeleteConfirm 
         open={openDeleteDialog} 
         onOpenChange={setOpenDeleteDialog} 
-        onSuccess={loadDepts} 
+        onSuccess={()=>{setOpenDeleteDialog(false); loadDepts(); setActiveDept(undefined);}} 
         deleteApi={deleteDept} 
         title="删除部门"
         >

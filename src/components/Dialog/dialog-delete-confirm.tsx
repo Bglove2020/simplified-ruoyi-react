@@ -35,7 +35,7 @@ export function DialogDeleteConfirm({
       setIsSubmitting(true);
       await new Promise((resolve) => setTimeout(resolve, 500));
       const res = await deleteApi();
-      if (res.data.success) {
+      if (res.data.code === 200) {
         toast.success(res.data.msg);
         onSuccess?.();
         onOpenChange(false)

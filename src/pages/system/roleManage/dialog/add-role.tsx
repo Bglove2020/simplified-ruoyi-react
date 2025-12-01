@@ -100,8 +100,9 @@ export default function AddRoleDialog({
         isCreate ? "/system/role/create" : "/system/role/update",
         roleData
       );
-      if (res.data.success) {
-        toast.success(res.data.msg);
+      // console.log('res',res);
+      if (res.data.code === 200) {
+        toast.success(res.data.data.msg);
         onOpenChange(false);
         onSuccess?.();
       } else {

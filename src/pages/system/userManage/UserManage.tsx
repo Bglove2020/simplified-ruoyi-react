@@ -81,10 +81,10 @@ export default function UserManage() {
 
   const loadUsers = useCallback(() => {
     axiosClient
-      .get<user[]>("/system/user/list")
+      .get<{data: user[]}>("/system/user/list")
       .then((res) => {
-        console.log(res.data);
-        setData(res.data);
+        console.log(res.data.data);
+        setData(res.data.data);
       })
       .catch((e) => {
         toast.error(String(e));
@@ -376,9 +376,10 @@ export default function UserManage() {
           }}
           title="删除用户"
         >
-          <div className="text-sm mb-2">确定要删除
+          <span className="text-sm mb-2 block">确定要删除
             <span className="bg-primary/10 border border-primary px-3 py-1 rounded-md mx-1">{activeUser?.account}</span>吗？
-          </div>
+          </span>
+          <span className="text-sm text-gray-500 block">注意：删除用户后，该用户将无法登录系统。</span>
         </DialogDeleteConfirm>
       )}
       {rowSelection && (

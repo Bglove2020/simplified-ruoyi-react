@@ -49,7 +49,7 @@ export function clearAccessToken() {
 }
 
 export const axiosClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://192.168.0.111:5173/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:5173/api',
   withCredentials: true,
 })
 
@@ -73,7 +73,7 @@ export async function refreshAccessToken(): Promise<string | null> {
     refreshPromise = refreshClient
       .post('/auth/refresh')
       .then((res) => {
-        const token = res.data.access_token ?? null
+        const token = res.data.data.accessToken ?? null
         if (token) {
           setAccessToken(token)
         } else {

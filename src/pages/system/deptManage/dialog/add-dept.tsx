@@ -49,7 +49,7 @@ export default function AddDeptDialog({
     axiosClient
       .get("/system/dept/list")
       .then((res) => {
-        setDeptTree(res.data);
+        setDeptTree(res.data.data);
       })
       .catch((err) => {
         console.error("加载部门列表失败:", err);
@@ -58,7 +58,7 @@ export default function AddDeptDialog({
 
   useEffect(() => {
     axiosClient.get("/system/user/list").then((res) => {
-      setUserList(res.data);
+      setUserList(res.data.data);
     });
   }, []);
 
@@ -67,27 +67,12 @@ export default function AddDeptDialog({
       name: z.string().min(1, { message: "部门名称不能为空" }),
       parentPublicId: z
         .string()
-        .min(1, { message: "父部门不能为空" })
-        .uuid({ message: "父部门必须是UUID格式" })
         .optional()
         .or(z.literal("")),
       sortOrder: z.number().int({ message: "排序号必须是整数" }),
       status: z.enum(["0", "1"], { message: "部门状态不能为空" }),
       leaderPublicId: z.string().optional(),
     })
-    .refine(
-      (data) => {
-        const noParent = !data.parentPublicId || data.parentPublicId === "";
-        if (isCreate && noParent) {
-          return false;
-        }
-        return true;
-      },
-      {
-        message: "请选择父部门",
-        path: ["parentPublicId"],
-      }
-    );
   type TAddDeptSchema = z.infer<typeof AddDeptSchema>;
 
   const {
@@ -131,8 +116,8 @@ export default function AddDeptDialog({
         isCreate ? "/system/dept/create" : "/system/dept/update",
         accountData
       );
-      if (res.data.success) {
-        toast.success(res.data.msg);
+      if (res.data.code === 200) {
+        toast.success(res.data.data.msg);
         onOpenChange(false);
         onSuccess?.();
       } else {

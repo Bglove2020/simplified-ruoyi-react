@@ -32,7 +32,7 @@ import { TreeSelect } from "@/components/tree-select"
 async function checkUserAccount(account: string) {
   try {
     const response = await axiosClient.get(`system/user/checkUserAccount?account=${account}`);
-    return response.data.available;
+    return response.data.data.available;
   } catch (error) {
     console.error('检查账号是否存在失败:', error);
     return false;
@@ -54,6 +54,7 @@ async function checkUserAccountWithDebounce(account: string, delay: number = 500
       try {
         // 执行异步校验
         const isAvailable = await checkUserAccount(account);
+        console.log('checkUserAccount',isAvailable);
         resolve(isAvailable);
       } catch (error) {
         resolve(false);
@@ -167,7 +168,7 @@ export function UserDialog({
 
   const loadDeptTree = useCallback(() => {
     axiosClient.get("/system/dept/list").then((res) => {
-      setDeptTree(res.data);
+      setDeptTree(res.data.data);
     });
   }, []);
 
