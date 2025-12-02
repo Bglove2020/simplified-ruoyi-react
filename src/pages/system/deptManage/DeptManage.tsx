@@ -88,7 +88,7 @@ export default function DeptManage() {
             publicId: row.original.publicId,
             status: checked ? "1" : "0",
           }).then((res) => {
-              if(res.data.success){
+              if(res.data.code === 200){
                 toast.success(res.data.msg);
                 loadDepts();
               }else{

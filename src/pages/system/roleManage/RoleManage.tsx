@@ -82,7 +82,7 @@ export default function RoleManage() {
   }, []);
 
   const deleteRole = useCallback(async () => {
-    return await axiosClient.delete(`/system/role/delete?publicId=${activeRole?.publicId}`);
+    return await axiosClient.delete(`/system/role/delete/${activeRole?.publicId}`);
   }, [activeRole]);
 
   useEffect(() => {
@@ -163,7 +163,7 @@ export default function RoleManage() {
             publicId: row.original.publicId,
             status: checked ? "1" : "0",
           }).then((res) => {
-            if(res.data.success){
+            if(res.data.code === 200){
               toast.success(res.data.msg);
               loadRoles();
             }else{
@@ -310,6 +310,7 @@ export default function RoleManage() {
           open={deleteDialogOpen}
           onOpenChange={setDeleteDialogOpen}
           deleteApi={deleteRole}
+          onSuccess={()=>{setDeleteDialogOpen(false); loadRoles();}}
           title="删除角色"
           >
             <div className="text-sm mb-2">确定要删除角色

@@ -81,7 +81,7 @@ export default function AddDeptDialog({
     axiosClient
       .get("/system/menu/list")
       .then((res) => {
-        setMenuTree(res.data);
+        setMenuTree(res.data.data);
       })
       .catch((err) => {
         console.error("加载菜单列表失败:", err);
@@ -155,7 +155,7 @@ export default function AddDeptDialog({
         isCreate ? "/system/menu/create" : "/system/menu/update",
         sendData
       );
-      if (res.data.success) {
+      if (res.data.code === 200) {
         toast.success(res.data.msg);
         onOpenChange(false);
         onSuccess?.();

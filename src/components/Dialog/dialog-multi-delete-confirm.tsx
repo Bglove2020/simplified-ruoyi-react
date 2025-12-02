@@ -9,19 +9,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Plus } from "lucide-react"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useState } from "react"
-import { useNavigate, Link } from "react-router-dom"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
 import { axiosClient } from "@/lib/apiClient"
-import { Loader2, SearchX } from "lucide-react"
+import { Loader2 } from "lucide-react"
 import { toast } from 'sonner'
 import qs from 'qs'
-
 
 export function DialogMultiDeleteConfirm({
   open,
@@ -36,29 +28,27 @@ export function DialogMultiDeleteConfirm({
   selected:Record<string, boolean>;
   onSuccess: () => void;
 }) {
-  // const userIds = data.filter(row => selected[row.userId]).map(row => row.userId)
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false); 
-  console.log("data:", data);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const accounts = data.filter(row => selected[row.publicId]).map(row => row.account)
 
   const onSubmit = async () => {
     try {
       setIsSubmitting(true);
       await new Promise((resolve) => setTimeout(resolve, 500));
-      
+
       const res = await axiosClient.delete(`system/user/delete-by-accounts?${qs.stringify({ "accounts": accounts }, { arrayFormat: 'repeat' })}`);
-      if (res.status === 200) {
+      if (res.data?.code === 200) {
         if(accounts.length <=2) {
           toast.success(`${accounts.join("、")} 删除成功！`);
         }
         else{
-          toast.success(`${accounts.slice(0,2).join("、")} 等${accounts.length}个用户删除成功！`);
+          toast.success(`${accounts.slice(0,2).join("、")} 等 ${accounts.length} 个用户删除成功！`);
         }
         onSuccess?.();
         onOpenChange(false)
       } else {
         console.error("用户删除失败", res);
-        toast.error("用户删除失败，请稍后重试。");
+        toast.error(res.data?.msg || "用户删除失败，请稍后重试。");
       }
     } catch (error) {
       console.error("删除用户时出错", error);
@@ -76,7 +66,7 @@ export function DialogMultiDeleteConfirm({
           <DialogTitle>删除用户</DialogTitle>
           <DialogDescription>
             {`确定要删除这 ${accounts.length} 个用户吗？`}
-          </DialogDescription>  
+          </DialogDescription>
         </DialogHeader>
           <div className="flex flex-wrap gap-3 max-h-[30vh] overflow-auto py-2">
             {

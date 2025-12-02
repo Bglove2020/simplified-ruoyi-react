@@ -48,7 +48,7 @@ export default function AddRoleDialog({
     axiosClient
       .get("/system/menu/list")
       .then((res) => {
-        setMenuTree(res.data);
+        setMenuTree(res.data.data);
       })
       .catch((err) => {
         console.error("加载菜单列表失败:", err);
@@ -95,6 +95,7 @@ export default function AddRoleDialog({
         sortOrder: data.sortOrder,
         status: data.status,
         menuIds: data.menuIds,
+        publicId: isCreate ? undefined : activeRole?.publicId,
       };
       const res = await axiosClient.post(
         isCreate ? "/system/role/create" : "/system/role/update",
@@ -102,7 +103,7 @@ export default function AddRoleDialog({
       );
       // console.log('res',res);
       if (res.data.code === 200) {
-        toast.success(res.data.data.msg);
+        toast.success(res.data.msg);
         onOpenChange(false);
         onSuccess?.();
       } else {

@@ -117,7 +117,7 @@ export default function AddDeptDialog({
         accountData
       );
       if (res.data.code === 200) {
-        toast.success(res.data.data.msg);
+        toast.success(res.data.msg);
         onOpenChange(false);
         onSuccess?.();
       } else {

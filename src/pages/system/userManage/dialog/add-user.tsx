@@ -180,7 +180,7 @@ export function UserDialog({
     try {
       await new Promise(resolve => setTimeout(resolve, 500));
       const res = await axiosClient.post(isCreate ? '/system/user/create' : '/system/user/update', data);
-      if (res.status === 201) {
+      if (res.data.code === 200) {
         toast.success(res.data.msg);
         onSuccess?.();
       } else {

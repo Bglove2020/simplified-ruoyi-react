@@ -51,13 +51,13 @@ export default function MenuManage() {
 
   const loadMenus = useCallback(() => {
     axiosClient
-      .get<MenuNode[]>("/system/menu/list")
-      .then((res) => { setData(res.data); })
+      .get<{data: MenuNode[]}>("/system/menu/list")
+      .then((res) => { setData(res.data.data); })
   }, [])
 
   const deleteMenu = useCallback(async () => {
     return await axiosClient.delete(`/system/menu/delete?publicId=${activeMenu?.publicId}`);
-  }, []);
+  }, [activeMenu]);
 
   useEffect(() => {
     loadMenus();
@@ -134,7 +134,7 @@ export default function MenuManage() {
             publicId: row.original.publicId,
             status: checked ? "1" : "0",
           }).then((res) => {
-              if(res.data.success){
+              if(res.data.code === 200){
                 toast.success(res.data.msg);
                 loadMenus();
               }else{
