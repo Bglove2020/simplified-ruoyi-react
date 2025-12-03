@@ -1,5 +1,10 @@
 import { useMemo } from "react";
-import { Navigate, Outlet, type RouteObject, useRoutes } from "react-router-dom";
+import {
+  Navigate,
+  Outlet,
+  type RouteObject,
+  useRoutes,
+} from "react-router-dom";
 import { useInfoQuery, useRoutersQuery } from "@/lib/authQueries";
 import { getAccessToken } from "@/lib/apiClient";
 import type { RouterItem } from "@/types/router";
@@ -16,7 +21,7 @@ import RoleManage from "./pages/system/roleManage/RoleManage";
 const NotFound = () => <div className="p-6 text-center">页面不存在</div>;
 
 const viewMap: Record<string, React.ReactNode> = {
-  "dashboard": <Dashboard />,
+  dashboard: <Dashboard />,
   "system/user-management": <UserManage />,
   "system/dept-management": <DeptManage />,
   "system/menu-management": <MenuManage />,
@@ -24,12 +29,14 @@ const viewMap: Record<string, React.ReactNode> = {
 };
 
 function mapRouters(nodes: RouterItem[]): RouteObject[] {
-  return nodes.filter(node => viewMap[node.path]).map((node) => {
-    return {
-      path: node.path,
-      element: viewMap[node.path],
-    };
-  });
+  return nodes
+    .filter((node) => viewMap[node.path])
+    .map((node) => {
+      return {
+        path: node.path,
+        element: viewMap[node.path],
+      };
+    });
 }
 
 function RequireAuth({
@@ -64,7 +71,7 @@ function App() {
 
   const dynamicRoutes = useMemo(
     () => mapRouters(routersQuery.data ?? []),
-    [routersQuery.data],
+    [routersQuery.data]
   );
 
   const element = useRoutes([
