@@ -26,7 +26,7 @@ import { HoverCardFormItem } from "../hover-card-form-item"
 async function checkUserAccount(account: string) {
   try {
     const response = await axiosClient.get(`system/user/checkUserAccount?account=${account}`);
-    return response.data.available;
+    return response.data.data.available;
   } catch (error) {
     console.error('检查账号是否存在失败:', error);
     return false;
