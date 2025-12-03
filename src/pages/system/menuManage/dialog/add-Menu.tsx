@@ -30,8 +30,14 @@ const AddDeptSchema = z
   .object({
     menuType: z.enum(["M", "C", "F"], { message: "菜单类型不能为空" }),
     name: z.string().min(1, { message: "菜单名称不能为空" }),
-    isFrame: z.enum(["0", "1"], { message: "是否外链不能为空" }).optional().or(z.literal("")),
-    visible: z.enum(["0", "1"], { message: "是否可见不能为空" }).optional().or(z.literal("")),
+    isFrame: z
+      .enum(["0", "1"], { message: "是否外链不能为空" })
+      .optional()
+      .or(z.literal("")),
+    visible: z
+      .enum(["0", "1"], { message: "是否可见不能为空" })
+      .optional()
+      .or(z.literal("")),
     parentPublicId: z
       .string()
       .uuid({ message: "父菜单必须是UUID格式" })
@@ -92,7 +98,7 @@ export default function AddDeptDialog({
       isFrame: isCreate ? "0" : activeData?.isFrame || "0",
       visible: isCreate ? "1" : activeData?.visible || "1",
       name: isCreate ? "" : activeData?.name || "",
-      parentPublicId:isCreate ? activeData?.publicId : undefined,
+      parentPublicId: isCreate ? activeData?.publicId : undefined,
       sortOrder: isCreate ? 0 : activeData?.sortOrder || 0,
       status: isCreate ? "1" : activeData?.status || "1",
       path: isCreate ? undefined : activeData?.path || undefined,
@@ -122,7 +128,7 @@ export default function AddDeptDialog({
       if (isCreate) {
         sendData = data;
       } else {
-        if(data.menuType ==="M"){
+        if (data.menuType === "M") {
           sendData = {
             publicId: activeData?.publicId,
             name: data.name,
@@ -131,8 +137,8 @@ export default function AddDeptDialog({
             path: data.path,
             visible: data.visible,
             isFrame: data.isFrame,
-          }
-        }else if(data.menuType === "C"){
+          };
+        } else if (data.menuType === "C") {
           sendData = {
             publicId: activeData?.publicId,
             name: data.name,
@@ -142,18 +148,18 @@ export default function AddDeptDialog({
             perms: data.perms,
             visible: data.visible,
             isFrame: data.isFrame,
-          }
-        }else if(data.menuType === "F"){
-        sendData = {
-          publicId: activeData?.publicId,
-          name: data.name,
-          sortOrder: data.sortOrder,
-          status: data.status,
-          perms: data.perms,
-        }
+          };
+        } else if (data.menuType === "F") {
+          sendData = {
+            publicId: activeData?.publicId,
+            name: data.name,
+            sortOrder: data.sortOrder,
+            status: data.status,
+            perms: data.perms,
+          };
         }
       }
-      console.log('sendData:', sendData);
+      console.log("sendData:", sendData);
       const res = await axiosClient.post(
         isCreate ? "/system/menu/create" : "/system/menu/update",
         sendData
@@ -175,9 +181,9 @@ export default function AddDeptDialog({
 
   // 当 menuType 切换时，重置表单字段为默认值（仅在创建模式下）
   useEffect(() => {
-    console.log('reset defaultValues:', defaultValues);
-    reset({...defaultValues ,menuType,isFrame});
-  }, [menuType,isFrame, reset]);
+    console.log("reset defaultValues:", defaultValues);
+    reset({ ...defaultValues, menuType, isFrame });
+  }, [menuType, isFrame, reset]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -187,9 +193,8 @@ export default function AddDeptDialog({
         </DialogHeader>
         <form className="max-h-[50vh sm:max-h-[65vh] overflow-y-auto pr-2 py-2">
           <FieldGroup className="!gap-4">
-            {
-              isCreate && (
-                <Field orientation="grid">
+            {isCreate && (
+              <Field orientation="grid">
                 <FieldLabel htmlFor="menuType">菜单类型</FieldLabel>
                 <Controller
                   name="menuType"
@@ -222,7 +227,7 @@ export default function AddDeptDialog({
                         <RadioGroupItem value="F" id="menuType-F" />
                         <label
                           htmlFor="menuType-F"
-                            className="text-sm font-medium min-w-8 sm:min-w-10"
+                          className="text-sm font-medium min-w-8 sm:min-w-10"
                         >
                           按钮
                         </label>
@@ -237,8 +242,7 @@ export default function AddDeptDialog({
                   />
                 )}
               </Field>
-              )
-            }
+            )}
 
             {menuType !== "M" && isCreate && (
               <Field orientation="grid">
@@ -448,7 +452,13 @@ export default function AddDeptDialog({
           <DialogClose asChild>
             <Button variant="outline">取消</Button>
           </DialogClose>
-          <Button type="submit" onClick={handleSubmit(onSubmit as any)}>
+          <Button
+            type="submit"
+            onClick={() => {
+              console.log(errors);
+              handleSubmit(onSubmit as any)();
+            }}
+          >
             确定
           </Button>
         </DialogFooter>
