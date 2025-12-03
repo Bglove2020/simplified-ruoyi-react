@@ -14,6 +14,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import { type SideBarItem } from "@/lib/authQueries"
 
 const data = {
   user: {
@@ -25,71 +26,42 @@ const data = {
     {
       title: "首页",
       url: "/Dashboard",
-      icon: SquareTerminal,
+      // icon: SquareTerminal,
       items: [],
     },
     {
       title: "系统管理",
-      url: "/system/user-manage",
+      url: "/system/user-management",
       icon: Bot,
       items: [
         {
           title: "用户管理",
-          icon: User,
-          url: "/system/user-manage",
+          // icon: User,
+          url: "/system/user-management",
         },
         {
           title: "院系管理",
-          icon: Building2,
-          url: "/system/dept-manage",
+          // icon: Building2,
+          url: "/system/dept-management",
         },
         {
           title: "菜单管理",
-          icon: Menu,
-          url: "/system/menu-manage",
+          // icon: Menu,
+          url: "/system/menu-management",
         },
         {
           title: "角色管理",
           icon: BookUser,
-          url: "/system/role-manage",
+          url: "/system/role-management",
         }
       ],
     },
   ],
-  // navSecondary: [
-  //   {
-  //     title: "Support",
-  //     url: "#",
-  //     icon: LifeBuoy,
-  //   },
-  //   {
-  //     title: "Feedback",
-  //     url: "#",
-  //     icon: Send,
-  //   },
-  // ],
-  // projects: [
-  //   {
-  //     name: "Design Engineering",
-  //     url: "#",
-  //     icon: Frame,
-  //   },
-  //   {
-  //     name: "Sales & Marketing",
-  //     url: "#",
-  //     icon: PieChart,
-  //   },
-  //   {
-  //     name: "Travel",
-  //     url: "#",
-  //     icon: Map,
-  //   },
-  // ],
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({ sideBarData }: { sideBarData: SideBarItem[] }) {
   return (
-    <Sidebar variant="inset" {...props}>
+    <Sidebar variant="inset">
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -108,13 +80,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={sideBarData} />
         {/* <NavProjects projects={data.projects} />
         <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
       </SidebarContent>
-      <SidebarFooter>
+      {/* <SidebarFooter>
         <NavUser user={data.user} />
-      </SidebarFooter>
+      </SidebarFooter> */}
     </Sidebar>
   )
 }

@@ -8,11 +8,13 @@ import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Sun } from 'lucide-react';
+import { useSideBarQuery } from "@/lib/authQueries"
 
 export default function AppLayout() {
+  const { data: sideBarData } = useSideBarQuery(true);
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <AppSidebar sideBarData={sideBarData ?? []} />
       <main className="max-w-full flex-1 m-0 sm:my-2 sm:mr-2 rounded-2xl bg-white sm:shadow-md ">
         <header className="sticky top-0 z-30 flex items-center gap-2 sm:gap-4 h-16 p-3 border-b border-border bg-background/40 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
           <SidebarTrigger className="scale-120 sm:scale-100" />

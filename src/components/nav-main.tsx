@@ -1,5 +1,5 @@
 import { ChevronRight, type LucideIcon } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 import {
   Collapsible,
@@ -15,42 +15,45 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
+import type { SideBarItem } from "@/lib/authQueries";
 
-export function NavMain({
-  items,
-}: {
-  items: {
-    title: string;
-    url: string;
-    icon: LucideIcon;
-    isActive?: boolean;
-    items?: {
-      title: string;
-      url: string;
-      icon: LucideIcon;
-    }[];
-  }[];
-}) {
+// type items = {
+//   title: string;
+//   url: string;
+//   isActive?: boolean;
+//   frame: boolean;
+//   children: items[];
+// }
+
+export function NavMain({items}: {items: SideBarItem[]}) {
   const { pathname } = useLocation();
+  const { isMobile, setOpenMobile } = useSidebar();
   const isMatch = (url: string) => pathname.includes(url);
+  
+  const handleLinkClick = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
   return (
     <SidebarGroup>
       <SidebarMenu>
         {items.map((item) => {
-          const groupActive = isMatch(item.url) || (item.items?.some((s) => isMatch(s.url)) ?? false);
+          const groupActive = isMatch(item.url) || (item.children?.some((s) => isMatch(s.url)) ?? false);
           return (
           <Collapsible key={item.title + pathname} asChild defaultOpen={groupActive}>
             <SidebarMenuItem>
-              {item.items?.length ? (
+              {item.children?.length ? (
                 <>
                   <CollapsibleTrigger asChild>
                     <div className="group">
                       <SidebarMenuButton asChild tooltip={item.title} isActive={groupActive}>
-                        <a href="#" className="gap-4">
-                          <item.icon />
+                        <Link to="#" className="gap-4">
+                          {/* <item.icon /> */}
                           <span>{item.title}</span>
-                        </a>
+                        </Link>
                       </SidebarMenuButton>
                       <SidebarMenuAction className="transition-transform group-data-[state=open]:rotate-90">
                         <ChevronRight />
@@ -60,13 +63,13 @@ export function NavMain({
                   </CollapsibleTrigger>
                   <CollapsibleContent>
                     <SidebarMenuSub className="pt-2 gap-2">
-                      {item.items?.map((subItem) => (
+                      {item.children?.map((subItem) => (
                         <SidebarMenuSubItem key={subItem.title}>
                           <SidebarMenuSubButton asChild isActive={isMatch(subItem.url)}>
-                            <a href={subItem.url} className="gap-4">
-                              <subItem.icon />
+                            <Link to={subItem.frame ? subItem.url : '/'+subItem.url} className="gap-4" onClick={handleLinkClick}>
+                              {/* <subItem.icon /> */}
                               <span>{subItem.title}</span>
-                            </a>
+                            </Link>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
                       ))}
@@ -75,10 +78,10 @@ export function NavMain({
                 </>
               ) : (
                 <SidebarMenuButton asChild tooltip={item.title} isActive={isMatch(item.url)}>
-                  <a href={item.url} className="gap-4">
-                    <item.icon />
+                  <Link to={item.frame ? item.url : '/'+item.url} className="gap-4" onClick={handleLinkClick}>
+                    {/* <item.icon /> */}
                     <span>{item.title}</span>
-                  </a>
+                  </Link>
                 </SidebarMenuButton>
               )}
             </SidebarMenuItem>
