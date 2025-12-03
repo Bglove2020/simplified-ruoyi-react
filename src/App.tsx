@@ -13,6 +13,7 @@ import { LoginForm } from "./components/Form/login";
 import { RegisterForm } from "./components/Form/register";
 import AppLayout from "./layouts/AppLayout";
 import Dashboard from "./pages/Dashboard";
+import Profile from "./pages/Profile";
 import UserManage from "./pages/system/userManage/UserManage";
 import DeptManage from "./pages/system/deptManage/DeptManage";
 import MenuManage from "./pages/system/menuManage/MenuManage";
@@ -98,6 +99,7 @@ function App() {
       ),
       children: [
         { index: true, element: <Navigate to="/Dashboard" replace /> },
+        { path: "profile", element: <Profile /> },
         ...dynamicRoutes,
       ],
     },

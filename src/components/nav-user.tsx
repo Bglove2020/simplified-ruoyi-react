@@ -85,7 +85,7 @@ export function NavUser({
             </DropdownMenuGroup> */}
             {/* <DropdownMenuSeparator /> */}
             <DropdownMenuGroup>
-              <DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => navigate("/profile")}>
                 <BadgeCheck />
                 Account
               </DropdownMenuItem>

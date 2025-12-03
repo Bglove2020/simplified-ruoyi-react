@@ -3,7 +3,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { AppBreadcrumb } from "@/components/app-breadcrumb";
 import { OpenTabsBar } from "@/components/open-tabs-bar";
 import { Separator } from "@/components/ui/separator";
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -34,6 +34,7 @@ export default function AppLayout() {
   const [theme, setTheme] = useState<Theme>(getInitialTheme);
   const { data: sideBarData } = useSideBarQuery(true);
   const { data: userInfo } = useInfoQuery(true);
+  const navigate = useNavigate();
   console.log(userInfo);
   console.log(sideBarData);
   useEffect(() => {
@@ -82,10 +83,12 @@ export default function AppLayout() {
               <DropdownMenuContent>
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>Profile</DropdownMenuItem>
-                <DropdownMenuItem>Billing</DropdownMenuItem>
-                <DropdownMenuItem>Team</DropdownMenuItem>
-                <DropdownMenuItem>Subscription</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => navigate("/profile")}>
+                  Profile
+                </DropdownMenuItem>
+                <DropdownMenuItem disabled>Billing</DropdownMenuItem>
+                <DropdownMenuItem disabled>Team</DropdownMenuItem>
+                <DropdownMenuItem disabled>Subscription</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
