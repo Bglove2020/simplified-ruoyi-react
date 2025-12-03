@@ -90,12 +90,13 @@ export default function MenuManage() {
       header: "是否可见", 
       cell: ({ row }) => {
         const isVisible = row.original.visible === "1";
+        const stateClass = isVisible
+          ? "bg-primary/10 border-primary text-primary"
+          : "bg-muted border-input text-muted-foreground";
         return (
-          <div className={`inline-flex items-center justify-center w-6 h-6 rounded-sm border ${
-            isVisible 
-              ? "bg-green-100 border-green-300 text-green-700" 
-              : "bg-gray-100 border-gray-300 text-gray-700"
-          }`}>
+          <div
+            className={`inline-flex items-center justify-center w-6 h-6 rounded-sm border ${stateClass}`}
+          >
             {isVisible ? (
               <Check className="w-4 h-4" />
             ) : (
@@ -110,12 +111,13 @@ export default function MenuManage() {
       header: "是否外链", 
       cell: ({ row }) => {
         const isFrame = row.original.isFrame === "1";
+        const stateClass = isFrame
+          ? "bg-primary/10 border-primary text-primary"
+          : "bg-muted border-input text-muted-foreground";
         return (
-          <div className={`inline-flex items-center justify-center w-6 h-6 rounded-sm border ${
-            isFrame 
-              ? "bg-green-100 border-green-300 text-green-700" 
-              : "bg-gray-100 border-gray-300 text-gray-700"
-          }`}>
+          <div
+            className={`inline-flex items-center justify-center w-6 h-6 rounded-sm border ${stateClass}`}
+          >
             {isFrame ? (
               <Check className="w-4 h-4" />
             ) : (
@@ -184,8 +186,8 @@ export default function MenuManage() {
                     setOpenDeleteDialog(true);
                   }}
                 >
-                  <span className="grow text-red-500">删除</span>
-                  <Trash2 color="#FB2C36" />
+                  <span className="grow text-destructive">删除</span>
+                  <Trash2 className="text-destructive" />
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -263,7 +265,7 @@ export default function MenuManage() {
             <span className="text-sm mb-2 block">确定要删除菜单
               <span className="bg-primary/10 border border-primary px-3 py-1 rounded-md mx-1">{activeMenu?.name}</span>吗？
             </span>
-            <span className="text-sm text-gray-500 block">注意：删除菜单后，该菜单下的所有子菜单将同时删除。</span>
+            <span className="text-sm text-muted-foreground block">注意：删除菜单后，该菜单下的所有子菜单将同时删除。</span>
         </DialogDeleteConfirm>
       }
 

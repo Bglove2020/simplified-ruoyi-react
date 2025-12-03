@@ -132,16 +132,16 @@ export default function DeptManage() {
                 <DropdownMenuSeparator className="my-1" />
                 <DropdownMenuItem
                   className="cursor-pointer gap-8"
-                  onClick={() => {
-                    setActiveDept(row.original);
-                    setOpenDeleteDialog(true);
-                  }}
-                >
-                  <span className="grow text-red-500">删除</span>
-                  <Trash2 color="#FB2C36" />
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+              onClick={() => {
+                setActiveDept(row.original);
+                setOpenDeleteDialog(true);
+              }}
+            >
+              <span className="grow text-destructive">删除</span>
+              <Trash2 className="text-destructive" />
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
           </>
         )
       }
@@ -217,7 +217,7 @@ export default function DeptManage() {
             <div className="text-sm mb-2">确定要删除
               <span className="bg-primary/10 border border-primary px-3 py-1 rounded-md mx-1">{activeDept?.name}</span>吗？
             </div>
-            <div className="text-sm text-gray-500">注意：删除部门后，该部门下的所有子部门和用户将同时删除。</div>
+            <div className="text-sm text-muted-foreground">注意：删除部门后，该部门下的所有子部门和用户将同时删除。</div>
         </DialogDeleteConfirm>
       }
 

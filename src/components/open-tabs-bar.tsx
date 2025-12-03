@@ -39,7 +39,7 @@ export function OpenTabsBar() {
     <div className="flex items-center gap-4 py-1 px-4 border-b border-border min">
       <Button
               size="sm"
-              className="text-inherit rounded-full shadow-sm px-4 h-7 bg-cyan-50"
+              className="text-inherit rounded-full shadow-sm px-4 h-7 bg-secondary"
               onClick={() => navigate('/')}
             >
               首页
@@ -54,7 +54,7 @@ export function OpenTabsBar() {
               key={tab.path}
               variant={active ? "secondary" : "ghost"}
               size="sm"
-              className="rounded-full shadow-sm pl-4 pr-2 h-7 bg-muted gap-0 transition-colors duration-100 ease-out hover:bg-white hover:text-md"
+              className="rounded-full shadow-sm pl-4 pr-2 h-7 bg-muted gap-0 transition-colors duration-100 ease-out hover:bg-card hover:text-md"
               onClick={() => navigate(tab.path)}
             >
               <span>{tab.label}</span>

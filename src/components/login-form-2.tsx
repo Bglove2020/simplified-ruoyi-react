@@ -87,7 +87,7 @@ export function LoginForm() {
                   <FieldLabel htmlFor="password">Password</FieldLabel>
                   <a
                     href="#"
-                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline text-gray-500"
+                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline text-muted-foreground"
                   >
                     Forgot your password?
                   </a>
@@ -99,7 +99,7 @@ export function LoginForm() {
                   onChange={(e) => {setPassword(e.target.value);console.log(e.target.value)}} 
                   required 
                   />
-                  <FieldDescription className="text-red-500">
+                  <FieldDescription className="text-destructive">
                     {error}
                 </FieldDescription>
               </Field>

@@ -134,7 +134,7 @@ export function RegisterForm({ ...props }: React.ComponentProps<typeof Card>) {
             <Field className="!gap-2">
               <FieldLabel htmlFor="name">用户名</FieldLabel>
               <Input id="name" type="text" placeholder="请输入用户名" {...register("name")} />
-              {errors.name && <FieldDescription className="text-red-500 text-left mt-0">{errors.name.message}</FieldDescription>}
+              {errors.name && <FieldDescription className="text-destructive text-left mt-0">{errors.name.message}</FieldDescription>}
             </Field>
 
             <Field className="!gap-2">
@@ -143,7 +143,7 @@ export function RegisterForm({ ...props }: React.ComponentProps<typeof Card>) {
                 <HoverCardFormItem content="账号长度最少6位，不能重复" />
               </FieldLabel>
               <Input id="account" type="text" placeholder="请输入账号" {...register("account")} />
-              {errors.account && <FieldDescription className="text-red-500 text-left mt-0">{errors.account.message}</FieldDescription>}
+              {errors.account && <FieldDescription className="text-destructive text-left mt-0">{errors.account.message}</FieldDescription>}
             </Field>
 
             <Field>
@@ -154,7 +154,7 @@ export function RegisterForm({ ...props }: React.ComponentProps<typeof Card>) {
                 placeholder="请输入邮箱"
                 {...register("email")}
               />
-              {errors.email && <FieldDescription className="text-red-500 text-left mt-0">{errors.email.message}</FieldDescription>}
+              {errors.email && <FieldDescription className="text-destructive text-left mt-0">{errors.email.message}</FieldDescription>}
             </Field>
 
             <Field>
@@ -163,7 +163,7 @@ export function RegisterForm({ ...props }: React.ComponentProps<typeof Card>) {
                 <HoverCardFormItem content="密码长度不能少于8位，必须包含至少一个英文字符、一个数字和一个特殊字符" />
               </FieldLabel>
               <Input id="password" type="password" placeholder="请输入密码" {...register("password")} />
-              {errors.password && <FieldDescription className="text-red-500 text-left mt-0">{errors.password.message}</FieldDescription>}
+              {errors.password && <FieldDescription className="text-destructive text-left mt-0">{errors.password.message}</FieldDescription>}
             </Field>
 
             <Field>
@@ -171,7 +171,7 @@ export function RegisterForm({ ...props }: React.ComponentProps<typeof Card>) {
                 确认密码
               </FieldLabel>
               <Input id="confirm-password" type="password" placeholder="请确认密码" {...register("confirmPassword")} />
-              {errors.confirmPassword && <FieldDescription className="text-red-500 text-left mt-0">{errors.confirmPassword.message}</FieldDescription>}
+              {errors.confirmPassword && <FieldDescription className="text-destructive text-left mt-0">{errors.confirmPassword.message}</FieldDescription>}
             </Field>
 
             <Field>
@@ -196,15 +196,15 @@ export function RegisterForm({ ...props }: React.ComponentProps<typeof Card>) {
                   </RadioGroup>
                 )}
               />
-              {errors.sex && <FieldDescription className="text-red-500 text-left mt-0">{errors.sex.message}</FieldDescription>} 
+              {errors.sex && <FieldDescription className="text-destructive text-left mt-0">{errors.sex.message}</FieldDescription>} 
             </Field>
 
               {/* Loading overlay */}
               {isSubmitting && (
-                <div className="absolute inset-0 bg-white/30 backdrop-blur-sm flex items-center justify-center rounded-lg">
+                <div className="absolute inset-0 bg-background/60 backdrop-blur-sm flex items-center justify-center rounded-lg">
                   <div className="flex flex-col items-center space-y-2">
-                    <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
-                    <span className="text-sm text-gray-600">正在创建账户...</span>
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                    <span className="text-sm text-muted-foreground">正在创建账户...</span>
                   </div>
                 </div>
               )}

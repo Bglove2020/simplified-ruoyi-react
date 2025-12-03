@@ -96,7 +96,7 @@ export function LoginForm() {
                   aria-invalid={errors.account?.message ? "true" : "false"}
                   {...register("account")}
                 />
-                {errors.account && <FieldDescription className="text-red-500 mt-0 text-left">{errors.account.message}</FieldDescription>} {/* 显示账号错误信息 */}
+                {errors.account && <FieldDescription className="text-destructive mt-0 text-left">{errors.account.message}</FieldDescription>} {/* 显示账号错误信息 */}
               </Field>
 
               <Field className="!gap-2" data-invalid={errors.password?.message? "true" : "false"}>
@@ -104,7 +104,7 @@ export function LoginForm() {
                   <FieldLabel htmlFor="password" >Password</FieldLabel>
                   <a
                     href="#"
-                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline text-gray-500"
+                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline text-muted-foreground"
                   >
                     Forgot your password?
                   </a>
@@ -116,7 +116,7 @@ export function LoginForm() {
                   aria-invalid={errors.password?.message ? "true" : "false"}
                   {...register("password")}
                   />
-                {errors.password && <FieldDescription className="text-red-500 mt-1 text-left">{errors.password.message}</FieldDescription>} {/* 显示密码错误信息 */}
+                {errors.password && <FieldDescription className="text-destructive mt-1 text-left">{errors.password.message}</FieldDescription>} {/* 显示密码错误信息 */}
               </Field> 
 
               <Field>

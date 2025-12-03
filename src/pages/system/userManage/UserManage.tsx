@@ -239,8 +239,8 @@ export default function UserManage() {
                   className="cursor-pointer gap-8"
                   onClick={() => openDeleteDialogFor(row.original)}
                 >
-                  <span className="grow text-red-500">删除</span>
-                  <Trash2 color="#FB2C36" />
+                  <span className="grow text-destructive">删除</span>
+                  <Trash2 className="text-destructive" />
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -382,7 +382,7 @@ export default function UserManage() {
           <span className="text-sm mb-2 block">确定要删除
             <span className="bg-primary/10 border border-primary px-3 py-1 rounded-md mx-1">{activeUser?.account}</span>吗？
           </span>
-          <span className="text-sm text-gray-500 block">注意：删除用户后，该用户将无法登录系统。</span>
+          <span className="text-sm text-muted-foreground block">注意：删除用户后，该用户将无法登录系统。</span>
         </DialogDeleteConfirm>
       )}
       {rowSelection && (
