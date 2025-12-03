@@ -14,22 +14,22 @@ export type RetryOptions = {
 // 内部使用的配置类型，扩展了 AxiosRequestConfig
 type InternalConfig = AxiosRequestConfig & RetryOptions & { __retryCount?: number; __isRetry?: boolean }
 
-// 环境变量调试信息
-console.log('=== Environment Variables Debug ===')
-console.log('import.meta.env exists:', !!import.meta.env)
-console.log('import.meta.env.VITE_API_BASE_URL:', import.meta.env.VITE_API_BASE_URL)
+// // 环境变量调试信息
+// console.log('=== Environment Variables Debug ===')
+// console.log('import.meta.env exists:', !!import.meta.env)
+// console.log('import.meta.env.VITE_API_BASE_URL:', import.meta.env.VITE_API_BASE_URL)
 
-// 检查所有环境变量
-if (import.meta.env) {
-  console.log('All env vars:')
-  Object.entries(import.meta.env).forEach(([key, value]) => {
-    console.log(`${key}: ${value}`)
-  })
-}
+// // 检查所有环境变量
+// if (import.meta.env) {
+//   console.log('All env vars:')
+//   Object.entries(import.meta.env).forEach(([key, value]) => {
+//     console.log(`${key}: ${value}`)
+//   })
+// }
 
-// 检查特定环境变量
-console.log('VITE_API_BASE_URL type:', typeof import.meta.env.VITE_API_BASE_URL)
-console.log('VITE_API_BASE_URL value:', JSON.stringify(import.meta.env.VITE_API_BASE_URL))
+// // 检查特定环境变量
+// console.log('VITE_API_BASE_URL type:', typeof import.meta.env.VITE_API_BASE_URL)
+// console.log('VITE_API_BASE_URL value:', JSON.stringify(import.meta.env.VITE_API_BASE_URL))
 
 // In-memory access token store
 let ACCESS_TOKEN: string | null = null
@@ -40,7 +40,7 @@ export function setAccessToken(token: string | null) {
 }
 
 export function getAccessToken() {
-  console.log('=== Getting Access Token ===', ACCESS_TOKEN)
+  // console.log('=== Getting Access Token ===', ACCESS_TOKEN)
   return ACCESS_TOKEN
 }
 

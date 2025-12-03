@@ -19,7 +19,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, Controller } from "react-hook-form";
 import { TreeSelect } from "@/components/tree-select";
 import { axiosClient } from "@/lib/apiClient";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 // import { SingleSelect } from "../../../../components/single-select";
 import { toast } from "sonner";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -45,10 +45,8 @@ const AddDeptSchema = z
   .refine(
     (data) => {
       const noParent = !data.parentPublicId || data.parentPublicId === "";
-      // 只有类型为 C 或 F 时，必须选择父菜单
-      console.log(noParent,data.parentPublicId)
-      console.log(["C", "F"].includes(data.menuType) && noParent,data)
-      if (["C", "F"].includes(data.menuType) && noParent) {
+      // 只有类型为 F 时，必须选择父菜单
+      if (["F"].includes(data.menuType) && noParent) {
         return false;
       }
       return true;
@@ -88,27 +86,32 @@ export default function AddDeptDialog({
       });
   }, []);
 
+  const defaultValues = useMemo(() => {
+    return {
+      menuType: isCreate ? "M" : activeData?.menuType || "M",
+      isFrame: isCreate ? "0" : activeData?.isFrame || "0",
+      visible: isCreate ? "1" : activeData?.visible || "1",
+      name: isCreate ? "" : activeData?.name || "",
+      parentPublicId:isCreate ? activeData?.publicId : undefined,
+      sortOrder: isCreate ? 0 : activeData?.sortOrder || 0,
+      status: isCreate ? "1" : activeData?.status || "1",
+      path: isCreate ? undefined : activeData?.path || undefined,
+      perms: isCreate ? undefined : activeData?.perms || undefined,
+    };
+  }, [isCreate, activeData]);
+
   const {
     control,
     register,
     handleSubmit,
     watch,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm<TAddDeptSchema>({
     resolver: zodResolver(AddDeptSchema),
     mode: "onChange",
     // shouldUnregister: true,
-    defaultValues: {
-      menuType: isCreate ? "M" : activeData?.menuType || "M",
-      isFrame: isCreate ? "0" : activeData?.isFrame || "0",
-      visible: isCreate ? "1" : activeData?.visible || "1",
-      name: isCreate ? "" : activeData?.name || "",
-      parentPublicId: activeData?.publicId || "",
-      sortOrder: isCreate ? 0 : activeData?.sortOrder || 0,
-      status: isCreate ? "1" : activeData?.status || "1",
-      path: isCreate ? undefined : activeData?.path || undefined,
-      perms: isCreate ? "" : activeData?.perms || "",
-    },
+    defaultValues: defaultValues,
   });
 
   const onSubmit = async (data: TAddDeptSchema) => {
@@ -169,6 +172,12 @@ export default function AddDeptDialog({
 
   const menuType = watch("menuType");
   const isFrame = watch("isFrame");
+
+  // 当 menuType 切换时，重置表单字段为默认值（仅在创建模式下）
+  useEffect(() => {
+    console.log('reset defaultValues:', defaultValues);
+    reset({...defaultValues ,menuType,isFrame});
+  }, [menuType,isFrame, reset]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

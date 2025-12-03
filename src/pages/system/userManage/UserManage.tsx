@@ -21,6 +21,7 @@ import { DialogFormChangePassword } from "@/components/Dialog/dialog-form-change
 import { DialogDeleteConfirm } from "@/components/Dialog/dialog-delete-confirm";
 import { DialogMultiDeleteConfirm } from "@/components/Dialog/dialog-multi-delete-confirm";
 import { Switch } from "@/components/ui/switch";
+import { Permission } from "@/hooks/usePermission";
 
 type Filters = {
   account: string;
@@ -302,10 +303,12 @@ export default function UserManage() {
           <Download />
         </Button> */}
 
-        <Button variant="outline" onClick={() => { setIsCreate(true); setUserDialogOpen(true) }}>
-          <span>新增用户</span>
-          <Plus />
-        </Button>
+        <Permission permission="system:user:create">
+          <Button variant="outline" onClick={() => { setIsCreate(true); setUserDialogOpen(true) }}>
+            <span>新增用户</span>
+            <Plus />
+          </Button>
+        </Permission>
 
         <Button
           variant="outline"

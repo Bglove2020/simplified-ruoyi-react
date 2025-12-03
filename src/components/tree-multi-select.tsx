@@ -308,6 +308,7 @@ export function TreeMultiSelect({
                 newSelectedIds.add(n.publicId);
               } else if (hasSelectedChildren) {
                 // 有子节点被选中，但不全选，父节点保持半选状态（不添加到 selectedIds）
+                newSelectedIds.add(n.publicId);
                 // 半选状态通过 calculateNodeState 计算得出
               } else {
                 // 没有子节点被选中，取消选中父节点

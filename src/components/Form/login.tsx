@@ -9,17 +9,18 @@ import {
 } from "@/components/ui/field"
 import * as z from "zod"
 import { Input } from "@/components/ui/input"
-import { axiosClient, setAccessToken } from "@/lib/apiClient"
+import { axiosClient, getAccessToken, setAccessToken } from "@/lib/apiClient"
 import { useNavigate, Link } from "react-router-dom" // 引入 useNavigate 和 Link
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { toast } from "sonner"
 import { userAccountSchema, passwordSchema } from "@/lib/validation"
+import { useQueryClient } from "@tanstack/react-query"
 
 // 定义数据校验类
 const LoginSchema = z.object({
   // 必填，且必須是有效的 email 格式
-  userAccount: userAccountSchema(),
+  account: userAccountSchema(),
   // 必填，長度至少為 8
   password: passwordSchema(),
 });
@@ -31,12 +32,13 @@ export function LoginForm() {
 
   // 初始化 useNavigate
   const navigate = useNavigate() 
+  const queryClient = useQueryClient()
 
   const { register, handleSubmit, formState: { errors, isSubmitting }} = useForm<LoginSchemaType>({
     resolver: zodResolver(LoginSchema),
     mode: "onBlur",
     defaultValues: {
-      userAccount: '',
+      account: '',
       password: '',
     },
   });
@@ -44,14 +46,24 @@ export function LoginForm() {
   const onSubmit = async (data: LoginSchemaType) => {
 
     try {
-      const res = await axiosClient.post('/auth/login', {userAccount: data.userAccount, password: data.password})
-      console.log(res)
+      const res = await axiosClient.post('/auth/login', {account: data.account, password: data.password})
+      // console.log(res)
       if (res.status === 201) {
         // Access Token 存入内存，Refresh Token 由服务端以 HttpOnly Cookie 设置
-        const token = res.data.access_token
+        const token = res.data.data.accessToken
+        // console.log('token',token)
         if (token) {
           setAccessToken(token)
         }
+        // console.log('等待5秒')
+        // await new Promise(resolve => setTimeout(resolve, 5000))
+        // console.log(getAccessToken())
+        // 强制刷新用户信息、路由和侧边栏数据
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: ["auth", "info"] }),
+          queryClient.invalidateQueries({ queryKey: ["auth", "routers"] }),
+          queryClient.invalidateQueries({ queryKey: ["auth", "sideBar"] }),
+        ])
         toast.success("登录成功！")
         navigate('/')
       } 
@@ -75,16 +87,16 @@ export function LoginForm() {
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)}> {/* 将 onSubmit 绑定到 form 元素 */}
             <FieldGroup >
-              <Field className="!gap-2" data-invalid={errors.userAccount?.message ? "true" : "false"}>
+              <Field className="!gap-2" data-invalid={errors.account?.message ? "true" : "false"}>
                 <FieldLabel htmlFor="account">Account</FieldLabel>
                 <Input
                   id="account"
                   type="text"
                   placeholder="Enter your account"
-                  aria-invalid={errors.userAccount?.message ? "true" : "false"}
-                  {...register("userAccount")}
+                  aria-invalid={errors.account?.message ? "true" : "false"}
+                  {...register("account")}
                 />
-                {errors.userAccount && <FieldDescription className="text-red-500 mt-0 text-left">{errors.userAccount.message}</FieldDescription>} {/* 显示账号错误信息 */}
+                {errors.account && <FieldDescription className="text-red-500 mt-0 text-left">{errors.account.message}</FieldDescription>} {/* 显示账号错误信息 */}
               </Field>
 
               <Field className="!gap-2" data-invalid={errors.password?.message? "true" : "false"}>
