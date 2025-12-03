@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { axiosClient } from "./apiClient";
 import type { RouterItem } from "@/types/router";
 
-type GetInfoResponse = {
+export type UserInfo = {
   user: {
     publicId: string;
     name: string;
@@ -23,8 +23,8 @@ export type SideBarItem = {
   children: SideBarItem[];
 };
 
-async function fetchInfo(): Promise<GetInfoResponse> {
-  const res = await axiosClient.get<{ data: GetInfoResponse }>("/getInfo");
+async function fetchInfo(): Promise<UserInfo> {
+  const res = await axiosClient.get<{ data: UserInfo }>("/getInfo");
   return res.data.data;
 }
 
@@ -34,7 +34,9 @@ async function fetchRouters(): Promise<RouterItem[]> {
 }
 
 async function fetchSideBar(): Promise<SideBarItem[]> {
-  const res = await axiosClient.get<{ data: SideBarItem[] }>("/getSideBarMenus");
+  const res = await axiosClient.get<{ data: SideBarItem[] }>(
+    "/getSideBarMenus"
+  );
   return res.data.data;
 }
 

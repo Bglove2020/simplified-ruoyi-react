@@ -1,10 +1,18 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Bot, Command, Building2, Menu, SquareTerminal, User, BookUser } from "lucide-react"
+import * as React from "react";
+import {
+  Bot,
+  Command,
+  Building2,
+  Menu,
+  SquareTerminal,
+  User,
+  BookUser,
+} from "lucide-react";
 
-import { NavMain } from "@/components/nav-main"
-import { NavUser } from "@/components/nav-user"
+import { NavMain } from "@/components/nav-main";
+import { NavUser } from "@/components/nav-user";
 import {
   Sidebar,
   SidebarContent,
@@ -13,53 +21,16 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
-import { type SideBarItem } from "@/lib/authQueries"
+} from "@/components/ui/sidebar";
+import { type SideBarItem, type UserInfo } from "@/lib/authQueries";
 
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  navMain: [
-    {
-      title: "首页",
-      url: "/Dashboard",
-      // icon: SquareTerminal,
-      items: [],
-    },
-    {
-      title: "系统管理",
-      url: "/system/user-management",
-      icon: Bot,
-      items: [
-        {
-          title: "用户管理",
-          // icon: User,
-          url: "/system/user-management",
-        },
-        {
-          title: "院系管理",
-          // icon: Building2,
-          url: "/system/dept-management",
-        },
-        {
-          title: "菜单管理",
-          // icon: Menu,
-          url: "/system/menu-management",
-        },
-        {
-          title: "角色管理",
-          icon: BookUser,
-          url: "/system/role-management",
-        }
-      ],
-    },
-  ],
-}
-
-export function AppSidebar({ sideBarData }: { sideBarData: SideBarItem[] }) {
+export function AppSidebar({
+  sideBarData,
+  userInfo,
+}: {
+  sideBarData: SideBarItem[];
+  userInfo: UserInfo;
+}) {
   return (
     <Sidebar variant="inset">
       <SidebarHeader>
@@ -81,12 +52,10 @@ export function AppSidebar({ sideBarData }: { sideBarData: SideBarItem[] }) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={sideBarData} />
-        {/* <NavProjects projects={data.projects} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
       </SidebarContent>
-      {/* <SidebarFooter>
-        <NavUser user={data.user} />
-      </SidebarFooter> */}
+      <SidebarFooter>
+        <NavUser user={userInfo.user} />
+      </SidebarFooter>
     </Sidebar>
-  )
+  );
 }

@@ -17,6 +17,7 @@ import {
 import { Moon, Sun } from "lucide-react";
 import { useSideBarQuery } from "@/lib/authQueries";
 import { useEffect, useState } from "react";
+import { useInfoQuery } from "@/lib/authQueries";
 
 type Theme = "light" | "dark";
 
@@ -32,7 +33,9 @@ const getInitialTheme = (): Theme => {
 export default function AppLayout() {
   const [theme, setTheme] = useState<Theme>(getInitialTheme);
   const { data: sideBarData } = useSideBarQuery(true);
-
+  const { data: userInfo } = useInfoQuery(true);
+  console.log(userInfo);
+  console.log(sideBarData);
   useEffect(() => {
     const root = document.documentElement;
     const isDark = theme === "dark";
@@ -46,7 +49,7 @@ export default function AppLayout() {
 
   return (
     <SidebarProvider>
-      <AppSidebar sideBarData={sideBarData ?? []} />
+      <AppSidebar sideBarData={sideBarData ?? []} userInfo={userInfo!} />
       <main className="max-w-full flex-1 m-0 sm:my-2 sm:mr-2 rounded-2xl bg-card sm:shadow-md">
         <header className="sticky top-0 z-30 flex items-center gap-2 sm:gap-4 h-16 p-3 border-b border-border bg-background/40 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
           <SidebarTrigger className="scale-120 sm:scale-100" />
@@ -87,8 +90,6 @@ export default function AppLayout() {
             </DropdownMenu>
           </div>
         </header>
-        {/* <Separator orientation="horizontal" className="data-[orientation=horizontal]:w-full h-1 bg-border" /> */}
-        {/* <OpenTabsBar /> */}
         <Outlet />
       </main>
     </SidebarProvider>
