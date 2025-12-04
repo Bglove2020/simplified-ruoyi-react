@@ -18,6 +18,8 @@ import UserManage from "./pages/system/userManage/UserManage";
 import DeptManage from "./pages/system/deptManage/DeptManage";
 import MenuManage from "./pages/system/menuManage/MenuManage";
 import RoleManage from "./pages/system/roleManage/RoleManage";
+import DictManage from "./pages/system/dictManage/DictManage";
+import DictDataPage from "./pages/system/dictManage/DictDataPage";
 
 const NotFound = () => <div className="p-6 text-center">页面不存在</div>;
 
@@ -27,6 +29,8 @@ const viewMap: Record<string, React.ReactNode> = {
   "system/dept-management": <DeptManage />,
   "system/menu-management": <MenuManage />,
   "system/role-management": <RoleManage />,
+  "system/dict-management": <DictManage />,
+  "system/dict-data-management": <DictDataPage />,
 };
 
 function mapRouters(nodes: RouterItem[]): RouteObject[] {

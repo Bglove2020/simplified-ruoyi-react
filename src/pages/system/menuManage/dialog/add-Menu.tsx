@@ -126,7 +126,11 @@ export default function AddDeptDialog({
       await new Promise((resolve) => setTimeout(resolve, 500));
       let sendData = {};
       if (isCreate) {
-        sendData = data;
+        sendData = {
+          ...data,
+          path: data.path ? data.path : undefined,
+          perms: data.perms ? data.perms : undefined,
+        };
       } else {
         if (data.menuType === "M") {
           sendData = {
@@ -134,7 +138,7 @@ export default function AddDeptDialog({
             name: data.name,
             sortOrder: data.sortOrder,
             status: data.status,
-            path: data.path,
+            path: data.path ? data.path : undefined,
             visible: data.visible,
             isFrame: data.isFrame,
           };
@@ -144,8 +148,8 @@ export default function AddDeptDialog({
             name: data.name,
             sortOrder: data.sortOrder,
             status: data.status,
-            path: data.path,
-            perms: data.perms,
+            path: data.path ? data.path : undefined,
+            perms: data.perms ? data.perms : undefined,
             visible: data.visible,
             isFrame: data.isFrame,
           };
@@ -155,7 +159,7 @@ export default function AddDeptDialog({
             name: data.name,
             sortOrder: data.sortOrder,
             status: data.status,
-            perms: data.perms,
+            perms: data.perms ? data.perms : undefined,
           };
         }
       }
