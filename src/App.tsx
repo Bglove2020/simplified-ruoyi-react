@@ -20,6 +20,7 @@ import MenuManage from "./pages/system/menuManage/MenuManage";
 import RoleManage from "./pages/system/roleManage/RoleManage";
 import DictManage from "./pages/system/dictManage/DictManage";
 import DictDataPage from "./pages/system/dictManage/DictDataPage";
+import DialogLoading from "./components/dialog-loading";
 
 const NotFound = () => <div className="p-6 text-center">页面不存在</div>;
 
@@ -78,6 +79,7 @@ function App() {
     () => mapRouters(routersQuery.data ?? []),
     [routersQuery.data]
   );
+  const isLoading = infoQuery.isFetching || routersQuery.isFetching;
 
   const element = useRoutes([
     {
@@ -102,14 +104,18 @@ function App() {
         </RequireAuth>
       ),
       children: [
-        { index: true, element: <Navigate to="/Dashboard" replace /> },
+        { index: true, element: <Navigate to="/dashboard" replace /> },
         { path: "profile", element: <Profile /> },
         ...dynamicRoutes,
       ],
     },
     {
       path: "*",
-      element: <Navigate to={token ? "/Dashboard" : "/auth/login"} replace />,
+      element: isLoading ? (
+        <DialogLoading title="页面加载中..." />
+      ) : (
+        <Navigate to={token ? "/dashboard" : "/auth/login"} replace />
+      ),
     },
   ]);
 
