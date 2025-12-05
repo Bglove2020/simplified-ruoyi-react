@@ -45,6 +45,7 @@ export function useInfoQuery(enabled: boolean) {
     queryKey: ["auth", "info"],
     queryFn: fetchInfo,
     enabled,
+    retry: false,
     staleTime: 30_000000,
   });
 }
@@ -54,6 +55,7 @@ export function useRoutersQuery(enabled: boolean) {
     queryKey: ["auth", "routers"],
     queryFn: fetchRouters,
     enabled,
+    retry: false,
     staleTime: 30_000000,
   });
 }
@@ -63,6 +65,7 @@ export function useSideBarQuery(enabled: boolean) {
     queryKey: ["auth", "sideBar"],
     queryFn: fetchSideBar,
     enabled,
+    retry: false,
     staleTime: 30_000000,
   });
 }

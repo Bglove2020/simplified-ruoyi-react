@@ -69,6 +69,7 @@ export function useDictDataByTypeQuery(
     queryKey: ["dict-type", dictType],
     queryFn: () => fetchDictDataByType(dictType),
     enabled: enabled ?? true,
+    retry: false,
     staleTime: 60_000,
   });
 }
