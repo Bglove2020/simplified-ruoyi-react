@@ -1,15 +1,6 @@
 "use client";
 
-import * as React from "react";
-import {
-  Bot,
-  Command,
-  Building2,
-  Menu,
-  SquareTerminal,
-  User,
-  BookUser,
-} from "lucide-react";
+import { Command } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
