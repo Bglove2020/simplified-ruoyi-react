@@ -1,7 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { ColumnDef, RowSelectionState } from "@tanstack/react-table";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useSearchParams } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,26 +9,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/data-table";
 import { Switch } from "@/components/ui/switch";
-import {
-  ArrowLeft,
-  MoreHorizontal,
-  Pencil,
-  Plus,
-  RefreshCw,
-  Trash2,
-} from "lucide-react";
+import { MoreHorizontal, Pencil, Plus, RefreshCw, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { axiosClient } from "@/lib/apiClient";
-import {
-  useDictDataQuery,
-  useDictDetailQuery,
-  type DictData,
-  type DictType,
-} from "@/lib/dictQueries";
+import { type DictData, useDictDataByTypeQuery } from "@/lib/dictQueries";
 import DictDataDialog from "./dialog/dict-data-dialog";
 import { DialogDeleteConfirm } from "@/components/Dialog/dialog-delete-confirm";
 import { SingleSelect } from "@/components/single-select";
@@ -38,11 +24,6 @@ type DataFilters = {
   status: string;
 };
 
-const statusOptions = [
-  { label: "正常", value: "1" },
-  { label: "停用", value: "0" },
-];
-
 const extractFilterEntries = (filters: Record<string, unknown>) =>
   Object.entries(filters).map(([key, val]) => ({
     id: key,
@@ -50,11 +31,9 @@ const extractFilterEntries = (filters: Record<string, unknown>) =>
   }));
 
 export default function DictDataPage() {
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const dictName = searchParams.get("name") ?? "";
   const dictType = searchParams.get("type") ?? "";
-  const queryClient = useQueryClient();
 
   const [dataFilters, setDataFilters] = useState<DataFilters>({
     status: "",
@@ -78,7 +57,7 @@ export default function DictDataPage() {
       .then((res) => {
         setDictDataList(res.data.data);
       });
-  }, []);
+  }, [dictType]);
 
   const updateDataStatus = (publicId: string, status: boolean) => {
     axiosClient
@@ -102,6 +81,8 @@ export default function DictDataPage() {
       `/system/dict/data/delete/${activeData!.publicId}`
     );
   }, [activeData]);
+
+  const statusList = useDictDataByTypeQuery("status").data ?? [];
 
   const dataColumns: ColumnDef<DictData>[] = [
     {
@@ -158,10 +139,6 @@ export default function DictDataPage() {
           }
         />
       ),
-      filterFn: (row, value, filterValue) => {
-        if (!filterValue) return true;
-        return row.getValue("status") === filterValue;
-      },
     },
     {
       id: "actions",
@@ -229,7 +206,7 @@ export default function DictDataPage() {
           <SingleSelect
             className="w-full"
             placeholder="请选择状态"
-            options={statusOptions}
+            options={statusList}
             value={dataFilters.status}
             label="状态"
             onChange={(v) => setDataFilters((f) => ({ ...f, status: v }))}

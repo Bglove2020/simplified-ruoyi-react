@@ -2,7 +2,6 @@ import * as React from "react";
 import {
   Breadcrumb,
   BreadcrumbItem,
-  BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
@@ -30,7 +29,7 @@ export function AppBreadcrumb() {
   return (
     <Breadcrumb>
       <BreadcrumbList>
-        {breadcrumbs.map((crumb, index) => (
+        {breadcrumbs.map((crumb) => (
           <React.Fragment key={crumb.to}>
             <BreadcrumbItem>
               <BreadcrumbPage className="text-muted-foreground font-normal">

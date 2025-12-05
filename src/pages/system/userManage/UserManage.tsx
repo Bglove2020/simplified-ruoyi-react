@@ -3,7 +3,14 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { SingleSelect } from "@/components/single-select";
 import { MultiSelect } from "@/components/multi-select";
-import { Trash, MoreHorizontal, Trash2, RotateCcw, Pencil, Plus } from "lucide-react";
+import {
+  Trash,
+  MoreHorizontal,
+  Trash2,
+  RotateCcw,
+  Pencil,
+  Plus,
+} from "lucide-react";
 import { DataTable } from "@/components/data-table";
 import type { ColumnDef, RowSelectionState } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -22,6 +29,7 @@ import { DialogDeleteConfirm } from "@/components/Dialog/dialog-delete-confirm";
 import { DialogMultiDeleteConfirm } from "@/components/Dialog/dialog-multi-delete-confirm";
 import { Switch } from "@/components/ui/switch";
 import { Permission } from "@/hooks/usePermission";
+import { useDictDataByTypeQuery } from "@/lib/dictQueries";
 
 type Filters = {
   account: string;
@@ -69,8 +77,7 @@ export default function UserManage() {
 
   // const [loading, setLoading] = useState(false);
   const [data, setData] = useState<user[]>([]);
-  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
-
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
   // 控制操作列弹窗（可编程开关）
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
@@ -82,7 +89,7 @@ export default function UserManage() {
 
   const loadUsers = useCallback(() => {
     axiosClient
-      .get<{data: user[]}>("/system/user/list")
+      .get<{ data: user[] }>("/system/user/list")
       .then((res) => {
         console.log(res.data.data);
         setData(res.data.data);
@@ -93,13 +100,20 @@ export default function UserManage() {
   }, []);
 
   const deleteUser = useCallback(async () => {
-    return await axiosClient.delete(`/system/user/delete/${activeUser?.publicId}`);
+    return await axiosClient.delete(
+      `/system/user/delete/${activeUser?.publicId}`
+    );
   }, [activeUser]);
 
   useEffect(() => {
     // 初始加载
     loadUsers();
   }, [loadUsers]);
+
+  // 获取状态
+  const statusList = useDictDataByTypeQuery("status").data ?? [];
+  // 获取性别列表
+  const sexList = useDictDataByTypeQuery("sex").data ?? [];
 
   const openResetDialogFor = (u: user) => {
     setActiveUser(u);
@@ -145,59 +159,60 @@ export default function UserManage() {
     {
       accessorKey: "name",
       header: "用户名",
-      cell: ({ row }) => (
-        row.getValue("name")
-      ),
+      cell: ({ row }) => row.getValue("name"),
     },
     {
       accessorKey: "deptName",
       header: "部门",
-      cell: ({ row }) => (
-        row.getValue("deptName")
-      ),
+      cell: ({ row }) => row.getValue("deptName"),
     },
     {
       accessorKey: "account",
       header: "账号",
-      cell: ({ row }) => (
-        row.getValue("account")
-      ),
+      cell: ({ row }) => row.getValue("account"),
     },
     {
       accessorKey: "email",
       header: "邮箱",
-      cell: ({ row }) => (
-        row.getValue("email")
-      ),
+      cell: ({ row }) => row.getValue("email"),
     },
     {
       accessorKey: "sex",
       header: "性别",
-      cell: ({ row }) => (
-        row.getValue("sex") === "0" ? "未知" : row.getValue("sex") === "1" ? "男" : "女"
-      ),
+      cell: ({ row }) =>
+        row.getValue("sex") === "0"
+          ? "未知"
+          : row.getValue("sex") === "1"
+            ? "男"
+            : "女",
     },
     {
       accessorKey: "status",
       header: "状态",
       cell: ({ row }) => (
-        <Switch checked={row.getValue("status") === "1"} onCheckedChange={(checked) => {
-          console.log("checked", checked);
-          console.log("row.getValue('publicId')", row.original.publicId);
-          axiosClient.post("/system/user/update", {
-            publicId: row.original.publicId,
-            status: checked ? "1" : "0",
-          }).then((res) => {
-            if (res.data.code === 200) {
-              toast.success(res.data.msg);
-              loadUsers();
-            } else {
-              toast.error(res.data.msg);
-            }
-          }).catch((e) => {
-            toast.error(String(e));
-          });
-        }} />
+        <Switch
+          checked={row.getValue("status") === "1"}
+          onCheckedChange={(checked) => {
+            console.log("checked", checked);
+            console.log("row.getValue('publicId')", row.original.publicId);
+            axiosClient
+              .post("/system/user/update", {
+                publicId: row.original.publicId,
+                status: checked ? "1" : "0",
+              })
+              .then((res) => {
+                if (res.data.code === 200) {
+                  toast.success(res.data.msg);
+                  loadUsers();
+                } else {
+                  toast.error(res.data.msg);
+                }
+              })
+              .catch((e) => {
+                toast.error(String(e));
+              });
+          }}
+        />
       ),
       filterFn: (row, value, filterValue) => {
         console.log("过滤数据", row, value, filterValue);
@@ -229,7 +244,11 @@ export default function UserManage() {
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className="cursor-pointer gap-8"
-                  onClick={() => { setIsCreate(false); setActiveUser(row.original); setUserDialogOpen(true) }}
+                  onClick={() => {
+                    setIsCreate(false);
+                    setActiveUser(row.original);
+                    setUserDialogOpen(true);
+                  }}
                 >
                   <span className="grow">编辑用户</span>
                   <Pencil />
@@ -271,8 +290,8 @@ export default function UserManage() {
         <div className="w-full max-w-[300px] flex items-center gap-2">
           <SingleSelect
             className="w-full"
-            placeholder="请选择状态"
-            options={singleSelectOptions}
+            placeholder="请选择性别"
+            options={sexList}
             value={filters.sex}
             label="性别"
             onChange={(v) => setFilters((f) => ({ ...f, sex: v }))}
@@ -283,14 +302,13 @@ export default function UserManage() {
         <div className="w-full max-w-[300px] flex items-center gap-2">
           {/* <Label htmlFor="school" className="shrink-0 w-20 text-base text-neutral-800">学校多选：</Label> */}
           <MultiSelect
-            options={multiSelectOptions}
+            options={statusList}
             value={filters.status}
             onChange={(v) => setFilters((f) => ({ ...f, status: v }))}
             placeholder="请选择状态"
             searchPlaceholder="搜索状态..."
           />
         </div>
-
       </div>
 
       <div className="flex flex-wrap items-center justify-start gap-2">
@@ -304,7 +322,13 @@ export default function UserManage() {
         </Button> */}
 
         <Permission permission="system:user:create">
-          <Button variant="outline" onClick={() => { setIsCreate(true); setUserDialogOpen(true) }}>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setIsCreate(true);
+              setUserDialogOpen(true);
+            }}
+          >
             <span>新增用户</span>
             <Plus />
           </Button>
@@ -339,21 +363,19 @@ export default function UserManage() {
         />
       </div>
 
-      {
-        userDialogOpen && (
-          <UserDialog
-            open={userDialogOpen}
-            onOpenChange={setUserDialogOpen}
-            onSuccess={() => {
-              loadUsers();
-              setUserDialogOpen(false);
-              setActiveUser(null);
-            }}
-            isCreate={isCreate}
-            activeUser={activeUser}
-          />
-        )
-      }
+      {userDialogOpen && (
+        <UserDialog
+          open={userDialogOpen}
+          onOpenChange={setUserDialogOpen}
+          onSuccess={() => {
+            loadUsers();
+            setUserDialogOpen(false);
+            setActiveUser(null);
+          }}
+          isCreate={isCreate}
+          activeUser={activeUser}
+        />
+      )}
 
       {/* 全局渲染一次：重置密码弹窗（受控） */}
       {activeUser && (
@@ -379,10 +401,16 @@ export default function UserManage() {
           }}
           title="删除用户"
         >
-          <span className="text-sm mb-2 block">确定要删除
-            <span className="bg-primary/10 border border-primary px-3 py-1 rounded-md mx-1">{activeUser?.account}</span>吗？
+          <span className="text-sm mb-2 block">
+            确定要删除
+            <span className="bg-primary/10 border border-primary px-3 py-1 rounded-md mx-1">
+              {activeUser?.account}
+            </span>
+            吗？
           </span>
-          <span className="text-sm text-muted-foreground block">注意：删除用户后，该用户将无法登录系统。</span>
+          <span className="text-sm text-muted-foreground block">
+            注意：删除用户后，该用户将无法登录系统。
+          </span>
         </DialogDeleteConfirm>
       )}
       {rowSelection && (

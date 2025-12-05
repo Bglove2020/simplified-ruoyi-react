@@ -16,7 +16,7 @@ import { Switch } from "@/components/ui/switch";
 import { MoreHorizontal, Pencil, Plus, RefreshCw, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { axiosClient } from "@/lib/apiClient";
-import { type DictType } from "@/lib/dictQueries";
+import { useDictDataByTypeQuery, type DictType } from "@/lib/dictQueries";
 import { DialogDeleteConfirm } from "@/components/Dialog/dialog-delete-confirm";
 import DictDialog from "./dialog/dict-dialog";
 import { useNavigate } from "react-router-dom";
@@ -86,6 +86,8 @@ export default function DictManage() {
   const deleteDict = useCallback(async () => {
     return axiosClient.delete(`/system/dict/delete/${activeDict!.publicId}`);
   }, [activeDict]);
+
+  const statusList = useDictDataByTypeQuery("status").data ?? [];
 
   const typeColumns: ColumnDef<DictType>[] = [
     {
@@ -236,7 +238,7 @@ export default function DictManage() {
           <SingleSelect
             className="w-full"
             placeholder="请选择状态"
-            options={statusOptions}
+            options={statusList}
             value={filters.status}
             label="状态"
             onChange={(v) => setFilters((f) => ({ ...f, status: v }))}

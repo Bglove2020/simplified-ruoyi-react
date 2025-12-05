@@ -55,14 +55,13 @@ export default function AddRoleDialog({
       });
   }, []);
 
-  const AddRoleSchema = z
-    .object({
-      name: z.string().min(1, { message: "角色名称不能为空" }),
-      roleKey: z.string().min(1, { message: "角色权限字符不能为空" }),
-      sortOrder: z.number().int({ message: "排序号必须是整数" }),
-      status: z.enum(["0", "1"], { message: "角色状态不能为空" }),
-      menuIds: z.array(z.string()),
-    })
+  const AddRoleSchema = z.object({
+    name: z.string().min(1, { message: "角色名称不能为空" }),
+    roleKey: z.string().min(1, { message: "角色权限字符不能为空" }),
+    sortOrder: z.number().int({ message: "排序号必须是整数" }),
+    status: z.enum(["0", "1"], { message: "角色状态不能为空" }),
+    menuIds: z.array(z.string()),
+  });
 
   type TAddRoleSchema = z.infer<typeof AddRoleSchema>;
 
@@ -78,7 +77,7 @@ export default function AddRoleDialog({
     shouldUnregister: true,
     defaultValues: {
       name: isCreate ? "" : activeRole?.name,
-      roleKey:isCreate ? "": activeRole?.roleKey,
+      roleKey: isCreate ? "" : activeRole?.roleKey,
       sortOrder: isCreate ? 0 : activeRole?.sortOrder,
       status: isCreate ? "1" : activeRole?.status,
       menuIds: isCreate ? [] : activeRole?.menuIds,
@@ -116,13 +115,12 @@ export default function AddRoleDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] max-h-[75vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{isCreate ? "新增角色" : "编辑角色"}</DialogTitle>
         </DialogHeader>
         <form className="max-h-[50vh sm:max-h-[65vh] overflow-y-auto pr-2 py-2">
           <FieldGroup className="!gap-4">
-
             <Field orientation="grid">
               <FieldLabel htmlFor="name">角色名称</FieldLabel>
               <Input
@@ -145,10 +143,7 @@ export default function AddRoleDialog({
                 {...register("roleKey")}
               />
               {errors.roleKey && (
-                <FieldError
-                  errors={[errors.roleKey]}
-                  className="col-start-2"
-                />
+                <FieldError errors={[errors.roleKey]} className="col-start-2" />
               )}
             </Field>
 

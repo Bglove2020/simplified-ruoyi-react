@@ -1,4 +1,4 @@
-import { ChevronRight, type LucideIcon } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
 import {
@@ -52,10 +52,10 @@ export function NavMain({ items }: { items: SideBarItem[] }) {
                           tooltip={item.title}
                           isActive={groupActive}
                         >
-                          <Link to="#" className="gap-4">
+                          <span className="gap-4">
                             {/* <item.icon /> */}
                             <span>{item.title}</span>
-                          </Link>
+                          </span>
                         </SidebarMenuButton>
                         <SidebarMenuAction className="transition-transform group-data-[state=open]:rotate-90">
                           <ChevronRight />

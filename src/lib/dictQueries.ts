@@ -21,60 +21,54 @@ export type DictData = {
   listClass?: string;
 };
 
-async function fetchDictTypes(): Promise<DictType[]> {
-  const res = await axiosClient.get<{ data: DictType[] }>("/system/dict/list");
-  return res.data.data;
-}
-
-async function fetchDictDetail(publicId: string): Promise<DictType> {
-  const res = await axiosClient.get<{ data: DictType }>(
-    `/system/dict/${publicId}`
-  );
-  return res.data.data;
-}
-
-async function fetchDictData(
-  dictPublicId: string,
-  dictType: string
-): Promise<DictData[]> {
+// 通过字典类型直接获取字典数据（不需要 publicId）
+async function fetchDictDataByType(dictType: string): Promise<DictData[]> {
   const res = await axiosClient.get<{ data: DictData[] }>(
     "/system/dict/data/list",
     {
-      params: { publicId: dictPublicId, type: dictType },
+      params: { type: dictType },
     }
   );
   return res.data.data;
 }
 
-export function useDictTypesQuery(enabled = true): UseQueryResult<DictType[]> {
-  return useQuery({
-    queryKey: ["dict-types"],
-    queryFn: fetchDictTypes,
-    enabled,
-    staleTime: 60_000,
-  });
+// 选项格式
+export type DictOption = {
+  label: string;
+  value: string;
+};
+
+// 将字典数据转换为选项格式的工具函数
+export function dictDataToOptions(
+  dictData: DictData[],
+  filterStatus = true
+): DictOption[] {
+  let data = dictData;
+
+  // 过滤掉停用的数据（status === "0"）
+  if (filterStatus) {
+    data = dictData.filter((item) => item.status === "1");
+  }
+
+  // 按排序号排序
+  data = [...data].sort((a, b) => a.sortOrder - b.sortOrder);
+
+  // 转换为选项格式
+  return data.map((item) => ({
+    label: item.label,
+    value: item.value,
+  }));
 }
 
-export function useDictDetailQuery(
-  publicId: string,
-  enabled = true
-): UseQueryResult<DictType> {
-  return useQuery({
-    queryKey: ["dict-detail", publicId],
-    queryFn: () => fetchDictDetail(publicId),
-    enabled: enabled && Boolean(publicId),
-    staleTime: 60_000,
-  });
-}
-
-export function useDictDataQuery(
-  params: { publicId: string; type: string } | null,
+// 通过字典类型直接获取字典数据的 hook（推荐使用）
+export function useDictDataByTypeQuery(
+  dictType: string,
   enabled = true
 ): UseQueryResult<DictData[]> {
   return useQuery({
-    queryKey: ["dict-data", params?.publicId, params?.type],
-    queryFn: () => fetchDictData(params!.publicId, params!.type),
-    enabled: enabled && Boolean(params?.publicId && params?.type),
+    queryKey: ["dict-type", dictType],
+    queryFn: () => fetchDictDataByType(dictType),
+    enabled: enabled ?? true,
     staleTime: 60_000,
   });
 }

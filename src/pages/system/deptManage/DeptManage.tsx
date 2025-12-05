@@ -1,26 +1,37 @@
-import { NestedDataTable } from "@/components/Table/nested-data-table"
-import type { ColumnDef } from "@tanstack/react-table"
+import { NestedDataTable } from "@/components/Table/nested-data-table";
+import type { ColumnDef } from "@tanstack/react-table";
 import { useCallback, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { SingleSelect } from "@/components/single-select";
-import { ArrowUpDown, CirclePlus, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import {
+  ArrowUpDown,
+  CirclePlus,
+  MoreHorizontal,
+  Pencil,
+  Trash2,
+} from "lucide-react";
 import { axiosClient } from "@/lib/apiClient";
 import { useEffect } from "react";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import AddDeptDialog from "@/pages/system/deptManage/dialog/add-dept";
 import type { DeptNode } from "@/types/tree";
 import { DialogDeleteConfirm } from "@/components/Dialog/dialog-delete-confirm";
-
+import { useDictDataByTypeQuery } from "@/lib/dictQueries";
 
 // 筛选条件
 type Filters = {
   name: string;
   status: string;
 };
-
 
 const singleSelectOptions = [
   { label: "启用", value: "1" },
@@ -38,7 +49,6 @@ const extractFilterEntries = (filters: Filters) => {
 };
 
 export default function DeptManage() {
-
   const [data, setData] = useState<DeptNode[]>([]);
   const [openAddDeptDialog, setOpenAddDeptDialog] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
@@ -50,61 +60,67 @@ export default function DeptManage() {
   });
 
   const loadDepts = useCallback(() => {
-    axiosClient
-      .get<{data: DeptNode[]}>("/system/dept/list")
-      .then((res) => { setData(res.data.data); })
-  }, [])
+    axiosClient.get<{ data: DeptNode[] }>("/system/dept/list").then((res) => {
+      setData(res.data.data);
+    });
+  }, []);
 
   const deleteDept = useCallback(async () => {
-    return await axiosClient.delete(`/system/dept/delete?publicId=${activeDept?.publicId}`);
+    return await axiosClient.delete(
+      `/system/dept/delete?publicId=${activeDept?.publicId}`
+    );
   }, [activeDept]);
 
   useEffect(() => {
     loadDepts();
   }, [loadDepts]);
 
+  const statusList = useDictDataByTypeQuery("status").data ?? [];
+
   const columns: ColumnDef<DeptNode>[] = [
     {
       accessorKey: "orderNum",
       header: "顺序",
-      cell: ({ row }) => (
-        row.original.sortOrder
-      ),
+      cell: ({ row }) => row.original.sortOrder,
     },
-  
+
     {
       accessorKey: "leaderEmail",
       header: "负责人邮箱",
-      cell: ({ row }) => (
-        row.original.leaderEmail
-      ),
+      cell: ({ row }) => row.original.leaderEmail,
     },
     {
       accessorKey: "status",
       header: "状态",
       cell: ({ row }) => (
-        <Switch checked={row.original.status == "1"} onCheckedChange={(checked) => {
-          axiosClient.post("/system/dept/update", {
-            publicId: row.original.publicId,
-            status: checked ? "1" : "0",
-          }).then((res) => {
-              if(res.data.code === 200){
-                toast.success(res.data.msg);
-                loadDepts();
-              }else{
-                toast.error(res.data.msg);
-              }
-            }).catch((err) => {
-              toast.error(err.response.data.msg);
-            });
-        }} />
+        <Switch
+          checked={row.original.status == "1"}
+          onCheckedChange={(checked) => {
+            axiosClient
+              .post("/system/dept/update", {
+                publicId: row.original.publicId,
+                status: checked ? "1" : "0",
+              })
+              .then((res) => {
+                if (res.data.code === 200) {
+                  toast.success(res.data.msg);
+                  loadDepts();
+                } else {
+                  toast.error(res.data.msg);
+                }
+              })
+              .catch((err) => {
+                toast.error(err.response.data.msg);
+              });
+          }}
+        />
       ),
     },
     {
       accessorKey: "actions",
       header: "操作",
       cell: ({ row }) => {
-        return(
+        return (
           <>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -116,7 +132,11 @@ export default function DeptManage() {
               <DropdownMenuContent align="end">
                 <DropdownMenuItem
                   className="cursor-pointer gap-8"
-                  onClick={() => {setActiveDept(row.original); setIsCreate(true);setOpenAddDeptDialog(true);}}
+                  onClick={() => {
+                    setActiveDept(row.original);
+                    setIsCreate(true);
+                    setOpenAddDeptDialog(true);
+                  }}
                 >
                   <span className="grow">添加子部门</span>
                   <CirclePlus />
@@ -124,29 +144,33 @@ export default function DeptManage() {
                 {/* <DropdownMenuSeparator className="my-1" /> */}
                 <DropdownMenuItem
                   className="cursor-pointer gap-8"
-                  onClick={() => {setActiveDept(row.original); setIsCreate(false);setOpenAddDeptDialog(true);}}
+                  onClick={() => {
+                    setActiveDept(row.original);
+                    setIsCreate(false);
+                    setOpenAddDeptDialog(true);
+                  }}
                 >
                   <span className="grow">编辑部门</span>
-                  <Pencil  />
+                  <Pencil />
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="my-1" />
                 <DropdownMenuItem
                   className="cursor-pointer gap-8"
-              onClick={() => {
-                setActiveDept(row.original);
-                setOpenDeleteDialog(true);
-              }}
-            >
-              <span className="grow text-destructive">删除</span>
-              <Trash2 className="text-destructive" />
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+                  onClick={() => {
+                    setActiveDept(row.original);
+                    setOpenDeleteDialog(true);
+                  }}
+                >
+                  <span className="grow text-destructive">删除</span>
+                  <Trash2 className="text-destructive" />
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </>
-        )
-      }
+        );
+      },
     },
-  ]
+  ];
 
   return (
     <div className="space-y-4 px-8 py-6">
@@ -169,7 +193,7 @@ export default function DeptManage() {
           <SingleSelect
             className="w-full"
             placeholder="请选择状态"
-            options={singleSelectOptions}
+            options={statusList}
             value={filters.status}
             label="状态"
             onChange={(v) => setFilters((f) => ({ ...f, status: v }))}
@@ -178,11 +202,18 @@ export default function DeptManage() {
       </div>
 
       <div className="flex flex-wrap items-center justify-start gap-2">
-        <Button variant="outline" onClick={() => {setOpenAddDeptDialog(true); setIsCreate(true); setActiveDept(undefined);}}>
-            <span>新增部门</span>
-            <CirclePlus />
-          </Button>
-        
+        <Button
+          variant="outline"
+          onClick={() => {
+            setOpenAddDeptDialog(true);
+            setIsCreate(true);
+            setActiveDept(undefined);
+          }}
+        >
+          <span>新增部门</span>
+          <CirclePlus />
+        </Button>
+
         <Button variant="outline">
           <span>展开 / 折叠</span>
           <ArrowUpDown />
@@ -199,28 +230,45 @@ export default function DeptManage() {
           getRowId={(r) => r.publicId}
           getSubRows={(r) => {
             const deptNode = r as DeptNode;
-            return (deptNode.children as DeptNode[])?.sort((a, b) => a.sortOrder - b.sortOrder);
+            return (deptNode.children as DeptNode[])?.sort(
+              (a, b) => a.sortOrder - b.sortOrder
+            );
           }}
         />
       </div>
-      {
-        openAddDeptDialog&&<AddDeptDialog open={openAddDeptDialog} onOpenChange={setOpenAddDeptDialog} onSuccess={loadDepts} activeDept={activeDept} isCreate={isCreate}/>
-      }
-      {
-        openDeleteDialog && <DialogDeleteConfirm 
-        open={openDeleteDialog} 
-        onOpenChange={setOpenDeleteDialog} 
-        onSuccess={()=>{setOpenDeleteDialog(false); loadDepts(); setActiveDept(undefined);}} 
-        deleteApi={deleteDept} 
-        title="删除部门"
+      {openAddDeptDialog && (
+        <AddDeptDialog
+          open={openAddDeptDialog}
+          onOpenChange={setOpenAddDeptDialog}
+          onSuccess={loadDepts}
+          activeDept={activeDept}
+          isCreate={isCreate}
+        />
+      )}
+      {openDeleteDialog && (
+        <DialogDeleteConfirm
+          open={openDeleteDialog}
+          onOpenChange={setOpenDeleteDialog}
+          onSuccess={() => {
+            setOpenDeleteDialog(false);
+            loadDepts();
+            setActiveDept(undefined);
+          }}
+          deleteApi={deleteDept}
+          title="删除部门"
         >
-            <div className="text-sm mb-2">确定要删除
-              <span className="bg-primary/10 border border-primary px-3 py-1 rounded-md mx-1">{activeDept?.name}</span>吗？
-            </div>
-            <div className="text-sm text-muted-foreground">注意：删除部门后，该部门下的所有子部门和用户将同时删除。</div>
+          <div className="text-sm mb-2">
+            确定要删除
+            <span className="bg-primary/10 border border-primary px-3 py-1 rounded-md mx-1">
+              {activeDept?.name}
+            </span>
+            吗？
+          </div>
+          <div className="text-sm text-muted-foreground">
+            注意：删除部门后，该部门下的所有子部门和用户将同时删除。
+          </div>
         </DialogDeleteConfirm>
-      }
-
+      )}
     </div>
   );
 }

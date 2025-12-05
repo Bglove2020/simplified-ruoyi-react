@@ -1,7 +1,6 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { AppBreadcrumb } from "@/components/app-breadcrumb";
-import { OpenTabsBar } from "@/components/open-tabs-bar";
 import { Separator } from "@/components/ui/separator";
 import { Outlet, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -80,10 +79,13 @@ export default function AppLayout() {
                   </AvatarFallback>
                 </Avatar>
               </DropdownMenuTrigger>
-              <DropdownMenuContent>
+              <DropdownMenuContent align="end">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onSelect={() => navigate("/profile")}>
+                <DropdownMenuItem
+                  onSelect={() => navigate("/profile")}
+                  className="cursor-pointer"
+                >
                   Profile
                 </DropdownMenuItem>
                 <DropdownMenuItem disabled>Billing</DropdownMenuItem>
